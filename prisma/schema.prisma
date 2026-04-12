@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── NextAuth tables ──────────────────────────────────
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime?
+  image           String?
+  passwordHash    String?
+  primaryCurrency String    @default("EUR")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+
+  bankAccounts    BankAccount[]
+  bankStatements  BankStatement[]
+  transactions    Transaction[]
+  cryptoHoldings  CryptoHolding[]
+  debts           Debt[]
+  properties      Property[]
+  analysisCache   AnalysisCache[]
+  chatMessages    ChatMessage[]
+  apiUsages       ApiUsage[]
+
+  anthropicKeyEncrypted String?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── Bank & Transactions ──────────────────────────────
+
+model BankAccount {
+  id             String   @id @default(cuid())
+  userId         String
+  name           String
+  currency       String   @default("EUR")
+  type           String   @default("checking")
+  currentBalance Float    @default(0)
+  balanceAsOf    DateTime?
+  createdAt      DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statements   BankStatement[]
+  transactions Transaction[]
+}
+
+model BankStatement {
+  id             String   @id @default(cuid())
+  userId         String
+  bankAccountId  String
+  fileName       String
+  fileType       String
+  uploadedAt     DateTime @default(now())
+  rawStoragePath String
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bankAccount BankAccount  @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  userId        String
+  bankAccountId String
+  statementId   String?
+  date          DateTime
+  description   String
+  amount        Float
+  currency      String   @default("EUR")
+  category      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bankAccount BankAccount    @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+  statement   BankStatement? @relation(fields: [statementId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, bankAccountId, date, description, amount], name: "transaction_natural_key")
+}
+
+// ── Crypto ───────────────────────────────────────────
+
+model CryptoHolding {
+  id          String   @id @default(cuid())
+  userId      String
+
+  coinId      String   // CoinGecko id: "bitcoin", "ethereum"
+  symbol      String   // "BTC" — denormalized for display
+  name        String   // "Bitcoin" — denormalized for display
+
+  quantity    Float
+  avgCostEur  Float
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snapshots CryptoSnapshot[]
+
+  @@unique([userId, coinId])
+  @@index([userId])
+}
+
+model CryptoSnapshot {
+  id        String   @id @default(cuid())
+  holdingId String
+
+  date      DateTime @db.Date
+  quantity  Float
+  priceEur  Float
+  valueEur  Float
+
+  createdAt DateTime @default(now())
+
+  holding CryptoHolding @relation(fields: [holdingId], references: [id], onDelete: Cascade)
+
+  @@unique([holdingId, date])
+  @@index([holdingId, date])
+}
+
+// ── Debts ────────────────────────────────────────────
+
+model Debt {
+  id             String   @id @default(cuid())
+  userId         String
+  name           String
+  type           String
+  originalAmount Float
+  currentBalance Float
+  interestRate   Float
+  monthlyPayment Float
+  currency       String   @default("EUR")
+  startDate      DateTime
+  endDate        DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments   DebtPayment[]
+  properties Property[]
+}
+
+model DebtPayment {
+  id        String   @id @default(cuid())
+  debtId    String
+  date      DateTime
+  amount    Float
+  principal Float
+  interest  Float
+  notes     String?
+
+  debt Debt @relation(fields: [debtId], references: [id], onDelete: Cascade)
+}
+
+// ── Property ─────────────────────────────────────────
+
+model Property {
+  id       String @id @default(cuid())
+  userId   String
+  name     String
+  currency String @default("EUR")
+  debtId   String?
+
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  debt       Debt?               @relation(fields: [debtId], references: [id], onDelete: SetNull)
+  valuations PropertyValuation[]
+}
+
+model PropertyValuation {
+  id             String   @id @default(cuid())
+  propertyId     String
+  estimatedValue Float
+  date           DateTime @default(now())
+  notes          String?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+// ── AI & Usage ───────────────────────────────────────
+
+model AnalysisCache {
+  id          String   @id @default(cuid())
+  userId      String
+  summary     Json
+  generatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ApiUsage {
+  id            String   @id @default(cuid())
+  userId        String
+  endpoint      String
+  model         String
+  inputTokens   Int
+  outputTokens  Int
+  estimatedCost Float
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Education ────────────────────────────────────────
+
+model Book {
+  id          String @id @default(cuid())
+  title       String
+  author      String
+  coverUrl    String?
+  description String? @db.Text
+  year        Int?
+  category    String
+  link        String?
+}
+
+model FinancialTip {
+  id       String  @id @default(cuid())
+  content  String  @db.Text
+  type     String
+  author   String?
+  category String?
+}
