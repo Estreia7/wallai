@@ -73,7 +73,7 @@ function DashboardErrorCard({ message }: { message: string }) {
       </p>
       <p className="mt-2 text-xs text-white/50 sm:text-sm">{message}</p>
       <a
-        href="/wallai/dashboard"
+        href="/dashboard"
         className="mt-4 inline-block text-xs text-emerald-400 hover:text-emerald-300 sm:text-sm"
       >
         Retry
@@ -85,7 +85,7 @@ function DashboardErrorCard({ message }: { message: string }) {
 export default async function Dashboard() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/wallai");
+    redirect("/");
   }
   const userId = session.user.id;
   const userName = session.user.name ?? null;

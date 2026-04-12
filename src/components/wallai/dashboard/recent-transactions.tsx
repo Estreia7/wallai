@@ -28,7 +28,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
           Recent Transactions
         </h3>
         <Link
-          href="/wallai/bank"
+          href="/bank"
           className="text-[10px] text-emerald-400 hover:text-emerald-300 sm:text-xs"
         >
           View all

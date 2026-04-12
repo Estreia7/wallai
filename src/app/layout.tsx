@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { WallAISessionProvider } from "@/components/wallai/session-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Playground | Bruno Estreia",
-  description: "Ideas, experiments, presentations and feature testing.",
+  title: "WallAI – Personal Finance",
+  description: "AI-powered personal finance dashboard",
 };
 
 export default function RootLayout({
@@ -27,7 +28,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <WallAISessionProvider>{children}</WallAISessionProvider>
+      </body>
     </html>
   );
 }

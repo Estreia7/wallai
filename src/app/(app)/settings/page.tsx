@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/wallai");
+    redirect("/");
   }
 
   const user = await prisma.user.findUnique({
@@ -20,7 +20,7 @@ export default async function SettingsPage() {
   });
 
   if (!user) {
-    redirect("/wallai");
+    redirect("/");
   }
 
   return (

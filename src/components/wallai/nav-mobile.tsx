@@ -18,14 +18,14 @@ import {
 } from "./nav-icons";
 
 const navItems = [
-  { icon: <DashboardIcon />, label: "Dashboard", href: "/wallai/dashboard" },
-  { icon: <BankIcon />, label: "Bank", href: "/wallai/bank" },
-  { icon: <CryptoIcon />, label: "Crypto", href: "/wallai/crypto" },
-  { icon: <DebtsIcon />, label: "Debts", href: "/wallai/debts" },
-  { icon: <PropertyIcon />, label: "Property", href: "/wallai/property" },
-  { icon: <AnalysisIcon />, label: "Analysis", href: "/wallai/analysis" },
-  { icon: <LearnIcon />, label: "Learn", href: "/wallai/learn" },
-  { icon: <SettingsIcon />, label: "Settings", href: "/wallai/settings" },
+  { icon: <DashboardIcon />, label: "Dashboard", href: "/dashboard" },
+  { icon: <BankIcon />, label: "Bank", href: "/bank" },
+  { icon: <CryptoIcon />, label: "Crypto", href: "/crypto" },
+  { icon: <DebtsIcon />, label: "Debts", href: "/debts" },
+  { icon: <PropertyIcon />, label: "Property", href: "/property" },
+  { icon: <AnalysisIcon />, label: "Analysis", href: "/analysis" },
+  { icon: <LearnIcon />, label: "Learn", href: "/learn" },
+  { icon: <SettingsIcon />, label: "Settings", href: "/settings" },
 ];
 
 export function NavMobile({ onLogout }: { onLogout: () => void }) {

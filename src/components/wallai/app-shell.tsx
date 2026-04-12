@@ -12,11 +12,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isLoginPage = pathname === "/wallai";
+  const isLoginPage = pathname === "/";
 
   useEffect(() => {
     if (status === "unauthenticated" && !isLoginPage) {
-      router.replace("/wallai");
+      router.replace("/");
     }
   }, [status, isLoginPage, router]);
 
@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   // Authenticated — full app shell
   function handleLogout() {
-    signOut({ callbackUrl: "/wallai" });
+    signOut({ callbackUrl: "/" });
   }
 
   return (
