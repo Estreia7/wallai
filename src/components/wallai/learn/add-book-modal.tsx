@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/wallai/modal";
 
 type SearchHit = {
-  googleId: string;
+  externalId: string;
   title: string;
   authors: string[];
   coverUrl: string | null;
@@ -75,7 +75,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          googleId: selected.googleId,
+          externalId: selected.externalId,
           status,
           rating: status === "read" ? rating : null,
         }),
@@ -107,7 +107,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
           {searching && <p className="text-xs text-white/40">Searching…</p>}
           <ul className="max-h-80 space-y-1 overflow-y-auto">
             {results.map((r) => (
-              <li key={r.googleId}>
+              <li key={r.externalId}>
                 <button
                   type="button"
                   onClick={() => setSelected(r)}

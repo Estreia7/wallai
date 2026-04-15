@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { searchGoogleBooks } from "@/lib/wallai/learn/google-books";
+import { searchBooks } from "@/lib/wallai/learn/book-search";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -13,6 +13,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ results: [] });
   }
 
-  const results = await searchGoogleBooks(q, 10);
+  const results = await searchBooks(q, 10);
   return NextResponse.json({ results });
 }

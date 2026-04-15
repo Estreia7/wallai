@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { searchGoogleBooks } from "@/lib/wallai/learn/google-books";
+import { getWorkByExternalId } from "@/lib/wallai/learn/book-search";
 import { generateTraits } from "@/lib/wallai/learn/ai-traits";
 
 const ALLOWED_STATUSES = new Set(["reading", "read", "wantToRead"]);
@@ -13,7 +13,13 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const googleId = typeof body?.googleId === "string" ? body.googleId : "";
+  // externalId is the canonical param; accept legacy `googleId` as alias.
+  const externalId =
+    typeof body?.externalId === "string"
+      ? body.externalId
+      : typeof body?.googleId === "string"
+        ? body.googleId
+        : "";
   const bookId = typeof body?.bookId === "string" ? body.bookId : "";
   const status = typeof body?.status === "string" ? body.status : "wantToRead";
   const rating =
@@ -21,8 +27,8 @@ export async function POST(request: Request) {
       ? body.rating
       : null;
 
-  if (!googleId && !bookId) {
-    return NextResponse.json({ error: "googleId or bookId required" }, { status: 400 });
+  if (!externalId && !bookId) {
+    return NextResponse.json({ error: "externalId or bookId required" }, { status: 400 });
   }
   if (!ALLOWED_STATUSES.has(status)) {
     return NextResponse.json({ error: "invalid status" }, { status: 400 });
@@ -30,18 +36,17 @@ export async function POST(request: Request) {
 
   let book = bookId
     ? await prisma.book.findUnique({ where: { id: bookId } })
-    : await prisma.book.findUnique({ where: { externalId: googleId } });
+    : await prisma.book.findUnique({ where: { externalId } });
 
-  if (!book && googleId) {
-    const searchResults = await searchGoogleBooks(googleId, 1);
-    const hit = searchResults.find((h) => h.googleId === googleId) ?? searchResults[0];
+  if (!book && externalId) {
+    const hit = await getWorkByExternalId(externalId);
     if (!hit) {
-      return NextResponse.json({ error: "book not found in Google Books" }, { status: 404 });
+      return NextResponse.json({ error: "book not found" }, { status: 404 });
     }
 
     book = await prisma.book.create({
       data: {
-        externalId: hit.googleId,
+        externalId: hit.externalId,
         title: hit.title,
         author: hit.authors.join(", ") || "Unknown",
         coverUrl: hit.coverUrl,
