@@ -31,6 +31,7 @@ model User {
   analysisCache   AnalysisCache[]
   chatMessages    ChatMessage[]
   apiUsages       ApiUsage[]
+  netWorthSnapshots NetWorthSnapshot[]
 
   anthropicKeyEncrypted String?
 }
@@ -273,4 +274,36 @@ model FinancialTip {
   type     String
   author   String?
   category String?
+}
+
+// ── FX & Snapshots ───────────────────────────────────
+
+model FxRate {
+  id        String   @id @default(cuid())
+  base      String
+  quote     String
+  rate      Float
+  date      DateTime
+  fetchedAt DateTime @default(now())
+
+  @@unique([base, quote, date])
+  @@index([base, quote])
+}
+
+model NetWorthSnapshot {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  currency  String
+  total     Float
+  cash      Float
+  crypto    Float
+  property  Float
+  debt      Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }

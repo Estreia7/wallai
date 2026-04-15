@@ -10,6 +10,7 @@ import { KpiRow } from "@/components/wallai/analysis/kpi-row";
 import { MonthlyFlowChart } from "@/components/wallai/analysis/monthly-flow-chart";
 import { CategoryBreakdownCard } from "@/components/wallai/analysis/category-breakdown";
 import { TopMerchantsCard } from "@/components/wallai/analysis/top-merchants";
+import { InsightCard } from "@/components/wallai/analysis/insight-card";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,8 @@ export default async function AnalysisPage({
             savingsRate={data.totals.savingsRate}
             currency={data.currency}
           />
+
+          <InsightCard period={period} />
 
           <MonthlyFlowChart data={data.monthly} currency={data.currency} />
 

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, isIncome } from "@/lib/wallai/categories";
+import { buildConverter } from "@/lib/wallai/fx";
 
 export type AnalysisPeriod = 3 | 6 | 12;
 
@@ -72,6 +73,7 @@ export async function getAnalysisData(
       select: {
         description: true,
         amount: true,
+        currency: true,
         category: true,
         date: true,
       },
@@ -79,6 +81,9 @@ export async function getAnalysisData(
   ]);
 
   const currency = user?.primaryCurrency ?? "EUR";
+  const txCurrencies = new Set<string>();
+  for (const tx of transactions) txCurrencies.add(tx.currency);
+  const toPrimary = await buildConverter(currency, txCurrencies);
 
   if (transactions.length === 0) {
     return {
@@ -109,21 +114,22 @@ export async function getAnalysisData(
 
   for (const tx of transactions) {
     const bucket = monthlyMap.get(formatMonth(tx.date));
+    const converted = toPrimary(tx.amount, tx.currency);
 
     if (isIncome(tx)) {
-      const amt = tx.amount;
+      const amt = converted;
       incomeTotal += amt;
       if (bucket) bucket.income += amt;
       const cat = tx.category && INCOME_SET.has(tx.category) ? tx.category : "Other Income";
       incomeByCat.set(cat, (incomeByCat.get(cat) ?? 0) + amt);
-    } else if (tx.amount < 0) {
-      const amt = Math.abs(tx.amount);
+    } else if (converted < 0) {
+      const amt = Math.abs(converted);
       expensesTotal += amt;
       if (bucket) bucket.expenses += amt;
       const cat = tx.category && EXPENSE_SET.has(tx.category) ? tx.category : "Other Expense";
       expensesByCat.set(cat, (expensesByCat.get(cat) ?? 0) + amt);
 
-      // Merchant key: first 40 chars of description (case-insensitive for dedupe)
+      // Merchant key: first 60 chars of description
       const descKey = tx.description.trim().slice(0, 60);
       if (descKey) {
         const existing = merchantMap.get(descKey) ?? { amount: 0, count: 0 };
