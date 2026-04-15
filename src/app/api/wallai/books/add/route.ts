@@ -44,19 +44,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "book not found" }, { status: 404 });
     }
 
-    book = await prisma.book.create({
-      data: {
-        externalId: hit.externalId,
-        title: hit.title,
-        author: hit.authors.join(", ") || "Unknown",
-        coverUrl: hit.coverUrl,
-        description: hit.description,
-        year: hit.publishedYear,
-        category: hit.category,
-        traits: [],
-        traitSource: null,
-      },
+    // Dedup: if a book with the same normalized title already exists (e.g. a
+    // curated seed row), link to that instead of creating a second copy.
+    const normalizedTitle = hit.title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const candidates = await prisma.book.findMany({
+      where: { title: { mode: "insensitive", contains: hit.title.split(":")[0].trim() } },
     });
+    const existing = candidates.find(
+      (c) => c.title.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() === normalizedTitle,
+    );
+
+    if (existing) {
+      book = existing;
+    } else {
+      book = await prisma.book.create({
+        data: {
+          externalId: hit.externalId,
+          title: hit.title,
+          author: hit.authors.join(", ") || "Unknown",
+          coverUrl: hit.coverUrl,
+          description: hit.description,
+          year: hit.publishedYear,
+          category: hit.category,
+          traits: [],
+          traitSource: null,
+        },
+      });
+    }
   }
 
   if (!book) {

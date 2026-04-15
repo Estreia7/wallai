@@ -8,7 +8,7 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 type SeedBook = {
-  externalId: string;      // Google Books volume ID
+  externalId: string;      // external provider ID (Open Library work key or legacy Google Books)
   title: string;
   author: string;
   category: string;
@@ -16,6 +16,42 @@ type SeedBook = {
   coverUrl?: string;
   description?: string;
   traits: number[];        // length 20, values 0-10
+  popularity?: number;     // 0-100; foundational classics 95+, niche 50-
+};
+
+// Foundational popularity tiers — used when no profile exists (starter bundle)
+// and as a boost in profile-based scoring. Higher = more-recommended to everyone.
+const POPULARITY: Record<string, number> = {
+  "The Psychology of Money": 100,
+  "Rich Dad Poor Dad": 98,
+  "The Intelligent Investor": 95,
+  "I Will Teach You to Be Rich": 94,
+  "The Simple Path to Wealth": 93,
+  "Your Money or Your Life": 92,
+  "The Millionaire Next Door": 90,
+  "The Total Money Makeover": 88,
+  "The Richest Man in Babylon": 87,
+  "The Little Book of Common Sense Investing": 86,
+  "Think and Grow Rich": 85,
+  "The Bogleheads' Guide to Investing": 84,
+  "The 4-Hour Workweek": 82,
+  "Money: Master the Game": 80,
+  "A Random Walk Down Wall Street": 78,
+  "One Up On Wall Street": 76,
+  "The Barefoot Investor": 75,
+  "Die With Zero": 74,
+  "The Wealthy Barber": 72,
+  "Unshakeable": 70,
+  "Millionaire Teacher": 68,
+  "Broke Millennial": 66,
+  "The Index Card": 64,
+  "Financial Freedom": 62,
+  "Set for Life": 60,
+  "The Psychology of Investing": 58,
+  "Quit Like a Millionaire": 56,
+  "The Millionaire Fastlane": 54,
+  "Security Analysis": 52,
+  "Early Retirement Extreme": 50,
 };
 
 // Scored by hand. Each vector is LEARN_TRAITS order. High values mark
@@ -366,6 +402,7 @@ async function main() {
         traits: b.traits,
         traitSource: "curated",
         traitsGeneratedAt: new Date(),
+        popularity: POPULARITY[b.title] ?? b.popularity ?? 50,
       },
     });
   }

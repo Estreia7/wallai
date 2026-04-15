@@ -83,12 +83,13 @@ export async function loadLearnPayload(userId: string): Promise<LearnPayload> {
     .map((b) => ({
       id: b.id,
       traits: b.traits,
+      popularity: b.popularity,
       raw: b,
     }));
 
   if (profile === null) {
     const starter = starterBundle(
-      pool.map((p) => ({ id: p.id, traits: p.traits })),
+      pool.map((p) => ({ id: p.id, traits: p.traits, popularity: p.popularity })),
       5,
     );
     const rawByIndex = new Map(pool.map((p) => [p.id, p.raw]));
@@ -117,7 +118,7 @@ export async function loadLearnPayload(userId: string): Promise<LearnPayload> {
   }
 
   const picked = pickTopN(
-    pool.map((p) => ({ id: p.id, traits: p.traits })),
+    pool.map((p) => ({ id: p.id, traits: p.traits, popularity: p.popularity })),
     profile,
     5,
   );

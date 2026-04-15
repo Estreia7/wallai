@@ -45,14 +45,24 @@ function vec(...nums: number[]): number[] {
   assert(profile![0] > 0, "low-rated books still shape the profile when no ≥4 exist");
 }
 
-// scoreBook: a gap-filling book beats a taste-match book
+// scoreBook: popularity beats gap-fill at equal popularity delta
 {
   const profile = vec(10, 10, 10, 10, 10, 0, 0, 0, 0, 0);
-  const tasteBook = { id: "t", traits: vec(10, 10, 10, 10, 10) };
-  const gapBook   = { id: "g", traits: vec(0, 0, 0, 0, 0, 10, 10, 10, 10, 10) };
+  const popularBook = { id: "p", traits: vec(10, 10, 10, 10, 10), popularity: 100 };
+  const nichegapBook = { id: "g", traits: vec(0, 0, 0, 0, 0, 10, 10, 10, 10, 10), popularity: 20 };
+  const popScore = scoreBook(popularBook, profile);
+  const nicheScore = scoreBook(nichegapBook, profile);
+  assert(popScore > nicheScore, `popular taste-match should beat niche gap-fill (pop ${popScore} vs niche ${nicheScore})`);
+}
+
+// scoreBook: at equal popularity, taste-match beats pure gap-fill
+{
+  const profile = vec(10, 10, 10, 10, 10, 0, 0, 0, 0, 0);
+  const tasteBook = { id: "t", traits: vec(10, 10, 10, 10, 10), popularity: 50 };
+  const gapBook   = { id: "g", traits: vec(0, 0, 0, 0, 0, 10, 10, 10, 10, 10), popularity: 50 };
   const tasteScore = scoreBook(tasteBook, profile);
   const gapScore = scoreBook(gapBook, profile);
-  assert(gapScore > tasteScore, `gapBook should outscore tasteBook (gap ${gapScore} vs taste ${tasteScore})`);
+  assert(tasteScore > gapScore, `tasteBook should outscore gapBook at equal popularity (taste ${tasteScore} vs gap ${gapScore})`);
 }
 
 // pickTopN: diversity actually diverges picks
@@ -84,17 +94,17 @@ function vec(...nums: number[]): number[] {
   assert(tag.includes("Taxes"), `expected Taxes tag, got: ${tag}`);
 }
 
-// starterBundle: covers distinct pillars
+// starterBundle: sorts by popularity (foundational classics first)
 {
   const pool = [
-    { id: "a", traits: vec(10, 10, 10) },
-    { id: "b", traits: vec(0, 0, 0, 10, 10) },
-    { id: "c", traits: vec(0, 0, 0, 10, 10) },
+    { id: "niche",   traits: vec(10, 10, 10), popularity: 30 },
+    { id: "classic", traits: vec(10, 0, 0),   popularity: 98 },
+    { id: "solid",   traits: vec(0, 10, 0),   popularity: 75 },
   ];
   const picks = starterBundle(pool, 2);
   assert(picks.length === 2, "two picks");
-  assert(picks[0].id === "a", `first pick covers most (got ${picks[0].id})`);
-  assert(picks[1].id === "b" || picks[1].id === "c", `second pick covers new traits, got ${picks[1].id}`);
+  assert(picks[0].id === "classic", `most-popular book first (got ${picks[0].id})`);
+  assert(picks[1].id === "solid", `second-most-popular second (got ${picks[1].id})`);
 }
 
 console.log("profile.test.ts — all assertions passed");

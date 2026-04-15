@@ -3,6 +3,7 @@ import { TRAIT_COUNT, LEARN_TRAITS } from "./traits";
 export type BookTraits = {
   id: string;
   traits: number[]; // length 20
+  popularity?: number; // 0-100, optional (defaults to 50 when absent)
 };
 
 export type BookWithUserState = BookTraits & {
@@ -58,15 +59,23 @@ export function cosine(a: number[], b: number[]): number {
  * 0.7 · gap-fill + 0.3 · taste-match. Both terms normalized to 0-1 so the
  * mix weights mean what they say.
  */
+/**
+ * Score an unread book against the user's profile.
+ * Tilted toward proven/popular books:
+ *   0.45 · popularity + 0.35 · taste-match + 0.20 · gap-fill
+ * Every term is normalized to 0-1.
+ */
 export function scoreBook(book: BookTraits, profile: Profile): number {
   const gap = profile.map((v) => 10 - v);
   const gapScore = cosine(gap, book.traits);
   const tasteScore = cosine(profile, book.traits);
-  return 0.7 * gapScore + 0.3 * tasteScore;
+  const popularityScore = Math.max(0, Math.min(1, (book.popularity ?? 50) / 100));
+  return 0.45 * popularityScore + 0.35 * tasteScore + 0.20 * gapScore;
 }
 
 /**
- * Greedy diverse top-N with similarity penalty so picks span multiple topics.
+ * Top-N picks. Small similarity penalty (0.15) prevents 5 near-duplicates
+ * but doesn't push off-topic books into the list just for variety.
  */
 export function pickTopN(
   candidates: BookTraits[],
@@ -89,7 +98,7 @@ export function pickTopN(
         const s = cosine(c.book.traits, p.book.traits);
         if (s > maxSim) maxSim = s;
       }
-      const adj = c.score * (1 - 0.5 * maxSim);
+      const adj = c.score * (1 - 0.15 * maxSim);
       if (adj > bestAdj) {
         bestAdj = adj;
         bestIdx = i;
@@ -123,44 +132,12 @@ export function whyTag(book: BookTraits, profile: Profile): string {
 }
 
 /**
- * Starter bundle for users with <3 read books: greedy max-coverage over
- * the curated pool. Pick the book that covers the most traits ≥7, then
- * the one that adds the most uncovered traits ≥7, repeat until N.
+ * Starter bundle for users with <3 read books: simply the most popular books
+ * in the curated pool. Proven classics beat broad-coverage picks — e.g. a new
+ * user sees "The Psychology of Money" before a niche real-estate book.
  */
 export function starterBundle(curated: BookTraits[], n: number): BookTraits[] {
-  const picked: BookTraits[] = [];
-  const covered = new Set<number>();
-  const pool = [...curated];
-
-  while (picked.length < n && pool.length > 0) {
-    let bestIdx = -1;
-    let bestNew = -1;
-    for (let i = 0; i < pool.length; i++) {
-      let added = 0;
-      for (let t = 0; t < TRAIT_COUNT; t++) {
-        if (pool[i].traits[t] >= 7 && !covered.has(t)) added++;
-      }
-      if (added > bestNew) {
-        bestNew = added;
-        bestIdx = i;
-      }
-    }
-    if (bestIdx === -1) break;
-    const chosen = pool[bestIdx];
-    picked.push(chosen);
-    for (let t = 0; t < TRAIT_COUNT; t++) {
-      if (chosen.traits[t] >= 7) covered.add(t);
-    }
-    pool.splice(bestIdx, 1);
-    if (covered.size === TRAIT_COUNT) {
-      pool.sort((a, b) => sum(b.traits) - sum(a.traits));
-    }
-  }
-  return picked;
-}
-
-function sum(a: number[]): number {
-  let s = 0;
-  for (const n of a) s += n;
-  return s;
+  return [...curated]
+    .sort((a, b) => (b.popularity ?? 50) - (a.popularity ?? 50))
+    .slice(0, n);
 }

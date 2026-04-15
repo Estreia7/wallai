@@ -272,6 +272,7 @@ model Book {
   traitSource       String?  // "curated" | "ai"
   traitsGeneratedAt DateTime?
   externalId        String?  @unique
+  popularity        Int      @default(50) // 0-100; foundational classics 95+, niche 50-
 
   userBooks     UserBook[]
   hiddenByUsers UserBookHidden[]
