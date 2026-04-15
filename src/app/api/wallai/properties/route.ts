@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { buildConverter } from "@/lib/wallai/fx";
 
 export async function GET() {
   const session = await auth();
@@ -20,7 +21,28 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json({ properties });
+  // Convert each linked debt's balance into its property's currency so
+  // equity math on the client is apples-to-apples.
+  const currencies = new Set<string>();
+  for (const p of properties) {
+    currencies.add(p.currency);
+    if (p.debt) currencies.add(p.debt.currency);
+  }
+  const converters = new Map<string, (n: number, from: string) => number>();
+  await Promise.all(
+    Array.from(currencies).map(async (c) => {
+      converters.set(c, await buildConverter(c, currencies));
+    }),
+  );
+
+  const enriched = properties.map((p) => {
+    const toProp = converters.get(p.currency);
+    const debtInPropertyCurrency =
+      p.debt && toProp ? toProp(p.debt.currentBalance, p.debt.currency) : 0;
+    return { ...p, debtInPropertyCurrency };
+  });
+
+  return NextResponse.json({ properties: enriched });
 }
 
 export async function POST(request: Request) {

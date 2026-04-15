@@ -52,7 +52,20 @@ export function projectPayoff(
   const months = Math.ceil(
     -Math.log(1 - (currentBalance * r) / monthlyPayment) / Math.log(1 + r),
   );
-  const totalInterest = months * monthlyPayment - currentBalance;
+
+  // Exact total interest: simulate amortization so the final (partial)
+  // payment is accounted for. `months * monthlyPayment - currentBalance`
+  // overestimates interest by up to one payment.
+  let balance = currentBalance;
+  let totalInterest = 0;
+  for (let i = 0; i < months; i++) {
+    const interestThisMonth = balance * r;
+    const principalThisMonth = Math.min(monthlyPayment - interestThisMonth, balance);
+    totalInterest += interestThisMonth;
+    balance -= principalThisMonth;
+    if (balance <= 0) break;
+  }
+
   const payoffDate = new Date();
   payoffDate.setMonth(payoffDate.getMonth() + months);
 

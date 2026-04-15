@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { isIncome } from "@/lib/wallai/categories";
+import { isIncome, isExpense, isTransfer } from "@/lib/wallai/categories";
 import { loadHoldings, computeTotals } from "@/lib/wallai/crypto/crypto-data";
 import { fetchPrices } from "@/lib/wallai/crypto/coingecko";
 import { buildConverter } from "@/lib/wallai/fx";
 import { loadSnapshots, recordSnapshot } from "@/lib/wallai/snapshots";
+import { loadEffectiveBankAccounts } from "@/lib/wallai/balances";
 
 export { isIncome } from "@/lib/wallai/categories";
 
@@ -89,10 +90,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       where: { id: userId },
       select: { name: true, primaryCurrency: true },
     }),
-    prisma.bankAccount.findMany({
-      where: { userId },
-      select: { id: true, currency: true, type: true, currentBalance: true },
-    }),
+    loadEffectiveBankAccounts(userId),
     prisma.debt.findMany({
       where: { userId },
       select: { id: true, currency: true, currentBalance: true },
@@ -186,11 +184,11 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   const toPrimary = await buildConverter(primaryCurrency, fxCurrencies);
 
   const cashValue = cashAccounts.reduce(
-    (sum, a) => sum + toPrimary(a.currentBalance, a.currency),
+    (sum, a) => sum + toPrimary(a.effectiveBalance, a.currency),
     0,
   );
   const creditSigned = creditAccounts.reduce(
-    (sum, a) => sum + toPrimary(a.currentBalance, a.currency),
+    (sum, a) => sum + toPrimary(a.effectiveBalance, a.currency),
     0,
   );
   const creditCardDebt = -creditSigned;
@@ -205,6 +203,18 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     (sum, p) => sum + toPrimary(p.valuations[0]?.estimatedValue ?? 0, p.currency),
     0,
   );
+  // Property equity = each property's value minus its linked debt (if any),
+  // floored at zero per property so an underwater mortgage doesn't pull a
+  // free-and-clear property's equity down.
+  const debtById = new Map(debts.map((d) => [d.id, d]));
+  const propertyEquity = properties.reduce((sum, p) => {
+    const value = toPrimary(p.valuations[0]?.estimatedValue ?? 0, p.currency);
+    const linked = p.debtId ? debtById.get(p.debtId) : undefined;
+    const linkedInPrimary = linked
+      ? toPrimary(linked.currentBalance, linked.currency)
+      : 0;
+    return sum + Math.max(value - linkedInPrimary, 0);
+  }, 0);
   const propertyConfigured = properties.length > 0;
 
   const cryptoInPrimary = toPrimary(cryptoTotals.totalValueEur, "EUR");
@@ -219,10 +229,24 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     console.error("[dashboard] recordSnapshot failed", err),
   );
 
-  /* ── Net worth change calc (end of last month) ─────── */
+  /* ── Trend + previous-month: both rely on stored snapshots ── */
 
-  const thisMonthSum = thisMonthSumRow._sum.amount ?? 0;
-  const previousMonthTotal = hasAnyTransactions ? netWorthTotal - thisMonthSum : null;
+  const stored = await loadSnapshots(userId, 365);
+
+  // Previous-month net worth = latest snapshot dated before this calendar
+  // month. Falls back to (netWorthTotal - thisMonthSum) only when no such
+  // snapshot exists (first-time users or days before snapshots started).
+  let previousMonthTotal: number | null = null;
+  for (let i = stored.length - 1; i >= 0; i--) {
+    if (stored[i].date < startOfThisMonth) {
+      previousMonthTotal = stored[i].total;
+      break;
+    }
+  }
+  if (previousMonthTotal === null && hasAnyTransactions) {
+    const thisMonthSum = thisMonthSumRow._sum.amount ?? 0;
+    previousMonthTotal = netWorthTotal - thisMonthSum;
+  }
 
   let changeAbs: number | null = null;
   let changePct: number | null = null;
@@ -233,9 +257,6 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     }
   }
 
-  /* ── Trend: prefer stored snapshots, fall back to reverse-compute ── */
-
-  const stored = await loadSnapshots(userId, 365);
   let netWorthTrend: Array<{ month: string; value: number }>;
 
   if (stored.length >= 2) {
@@ -271,12 +292,13 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     ivMap.set(formatMonth(firstDayOfMonth(-i)), { income: 0, expenses: 0 });
   }
   for (const tx of recentWindowTransactions) {
+    if (isTransfer(tx)) continue;
     const key = formatMonth(tx.date);
     const bucket = ivMap.get(key);
     if (!bucket) continue;
     if (isIncome(tx)) {
       bucket.income += tx.amount;
-    } else if (tx.amount < 0) {
+    } else if (isExpense(tx)) {
       bucket.expenses += Math.abs(tx.amount);
     }
   }
@@ -320,7 +342,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         coinCount: cryptoTotals.coinCount,
         configured: cryptoTotals.coinCount > 0,
       },
-      propertyEq: { value: propertyValue, configured: propertyConfigured },
+      propertyEq: { value: propertyEquity, configured: propertyConfigured },
       debt: {
         value: debtValue,
         accountCount: debtAccountCount,

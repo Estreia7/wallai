@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, isIncome } from "@/lib/wallai/categories";
+import { INCOME_CATEGORIES, EXPENSE_CATEGORIES, isIncome, isExpense, isTransfer } from "@/lib/wallai/categories";
 import { buildConverter } from "@/lib/wallai/fx";
 
 export type AnalysisPeriod = 3 | 6 | 12;
@@ -55,6 +55,16 @@ function formatMonth(date: Date): string {
 
 const INCOME_SET = new Set<string>(INCOME_CATEGORIES);
 const EXPENSE_SET = new Set<string>(EXPENSE_CATEGORIES);
+
+// Merchant key: uppercase + collapse whitespace + strip trailing tokens that
+// look like order IDs (digits, #123, dates, card-auth codes).
+function normalizeMerchant(desc: string): string {
+  let s = desc.trim().toUpperCase().replace(/\s+/g, " ");
+  s = s.replace(/\s*#\s*\d+.*$/, "");
+  s = s.replace(/\s+\d{2,}[\d\-/\s]*$/, "");
+  s = s.replace(/\s+[A-Z0-9]{8,}$/, "");
+  return s.slice(0, 60);
+}
 
 export async function getAnalysisData(
   userId: string,
@@ -113,6 +123,7 @@ export async function getAnalysisData(
   const merchantMap = new Map<string, { amount: number; count: number }>();
 
   for (const tx of transactions) {
+    if (isTransfer(tx)) continue;
     const bucket = monthlyMap.get(formatMonth(tx.date));
     const converted = toPrimary(tx.amount, tx.currency);
 
@@ -122,15 +133,14 @@ export async function getAnalysisData(
       if (bucket) bucket.income += amt;
       const cat = tx.category && INCOME_SET.has(tx.category) ? tx.category : "Other Income";
       incomeByCat.set(cat, (incomeByCat.get(cat) ?? 0) + amt);
-    } else if (converted < 0) {
+    } else if (isExpense(tx)) {
       const amt = Math.abs(converted);
       expensesTotal += amt;
       if (bucket) bucket.expenses += amt;
       const cat = tx.category && EXPENSE_SET.has(tx.category) ? tx.category : "Other Expense";
       expensesByCat.set(cat, (expensesByCat.get(cat) ?? 0) + amt);
 
-      // Merchant key: first 60 chars of description
-      const descKey = tx.description.trim().slice(0, 60);
+      const descKey = normalizeMerchant(tx.description);
       if (descKey) {
         const existing = merchantMap.get(descKey) ?? { amount: 0, count: 0 };
         existing.amount += amt;

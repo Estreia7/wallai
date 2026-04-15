@@ -15,6 +15,7 @@ type Property = {
   currency: string;
   debtId: string | null;
   debt: LinkedDebt | null;
+  debtInPropertyCurrency?: number;
   valuations: Valuation[];
 };
 
@@ -52,7 +53,11 @@ function PropertyCard({
 
   const latest = property.valuations[0] ?? null;
   const marketValue = latest?.estimatedValue ?? 0;
-  const debtBalance = property.debt?.currentBalance ?? 0;
+  // Use FX-converted debt balance (in the property's currency) when the
+  // linked debt is in a different currency. Falls back to raw balance for
+  // backwards compatibility if the API didn't provide it.
+  const debtBalance =
+    property.debtInPropertyCurrency ?? property.debt?.currentBalance ?? 0;
   const equity = marketValue - debtBalance;
   const equityPct = marketValue > 0 ? (equity / marketValue) * 100 : 0;
 
@@ -243,13 +248,19 @@ export function PropertyList() {
     await load();
   }
 
+  // Per-property equity uses the FX-converted debt, then we sum. Only
+  // meaningful when all properties share a currency — flagged below.
   const totalValue = properties.reduce(
     (s, p) => s + (p.valuations[0]?.estimatedValue ?? 0),
     0,
   );
-  const totalDebt = properties.reduce((s, p) => s + (p.debt?.currentBalance ?? 0), 0);
+  const totalDebt = properties.reduce(
+    (s, p) => s + (p.debtInPropertyCurrency ?? p.debt?.currentBalance ?? 0),
+    0,
+  );
   const totalEquity = totalValue - totalDebt;
   const primaryCurrency = properties[0]?.currency ?? "EUR";
+  const mixedCurrencies = new Set(properties.map((p) => p.currency)).size > 1;
 
   return (
     <>
@@ -282,6 +293,11 @@ export function PropertyList() {
       ) : (
         <div className="space-y-4">
           <GlassCard>
+            {mixedCurrencies && (
+              <p className="mb-2 text-[10px] text-amber-400/80">
+                Totals shown in {primaryCurrency}. Mixed-currency properties — see the dashboard for the converted portfolio view.
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div>
                 <div className="text-[10px] uppercase tracking-wider text-white/40">Total value</div>

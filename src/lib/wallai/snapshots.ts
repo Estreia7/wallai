@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { loadHoldings, computeTotals } from "@/lib/wallai/crypto/crypto-data";
 import { fetchPrices } from "@/lib/wallai/crypto/coingecko";
 import { buildConverter } from "@/lib/wallai/fx";
+import { loadEffectiveBankAccounts } from "@/lib/wallai/balances";
 
 export type CurrentSnapshot = {
   currency: string;
@@ -19,10 +20,7 @@ export async function computeCurrentSnapshot(userId: string): Promise<CurrentSna
       where: { id: userId },
       select: { primaryCurrency: true },
     }),
-    prisma.bankAccount.findMany({
-      where: { userId },
-      select: { currency: true, type: true, currentBalance: true },
-    }),
+    loadEffectiveBankAccounts(userId),
     prisma.debt.findMany({
       where: { userId },
       select: { currency: true, currentBalance: true },
@@ -63,7 +61,7 @@ export async function computeCurrentSnapshot(userId: string): Promise<CurrentSna
   let cash = 0;
   let creditSigned = 0;
   for (const a of bankAccounts) {
-    const v = toPrimary(a.currentBalance, a.currency);
+    const v = toPrimary(a.effectiveBalance, a.currency);
     if (a.type === "checking" || a.type === "savings") cash += v;
     else if (a.type === "credit") creditSigned += v;
   }
