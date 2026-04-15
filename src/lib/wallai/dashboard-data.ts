@@ -26,7 +26,7 @@ export type DashboardData = {
       coinCount: number;
       configured: boolean;
     };
-    propertyEq: { value: 0; configured: false };
+    propertyEq: { value: number; configured: boolean };
     debt: { value: number; accountCount: number; configured: boolean };
   };
   netWorthTrend: Array<{ month: string; value: number }>;
@@ -74,6 +74,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     user,
     bankAccounts,
     debts,
+    properties,
     thisMonthSumRow,
     monthlyDeltaRows,
     recentWindowTransactions,
@@ -93,6 +94,19 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     prisma.debt.findMany({
       where: { userId },
       select: { id: true, currency: true, currentBalance: true },
+    }),
+    prisma.property.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        currency: true,
+        debtId: true,
+        valuations: {
+          orderBy: { date: "desc" },
+          take: 1,
+          select: { estimatedValue: true },
+        },
+      },
     }),
     prisma.transaction.aggregate({
       where: { userId, date: { gte: startOfThisMonth } },
@@ -168,8 +182,18 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   const debtValue = creditCardDebt + loanDebt;
   const debtAccountCount = creditAccounts.length + debts.length;
 
+  const propertyValue = properties.reduce(
+    (sum, p) => sum + (p.valuations[0]?.estimatedValue ?? 0),
+    0,
+  );
+  const propertyConfigured = properties.length > 0;
+
   const netWorthTotal =
-    cashValue + creditSigned - loanDebt + cryptoTotals.totalValueEur;
+    cashValue +
+    creditSigned -
+    loanDebt +
+    cryptoTotals.totalValueEur +
+    propertyValue;
 
   /* ── Net worth change calc (end of last month) ─────── */
 
@@ -256,7 +280,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         coinCount: cryptoTotals.coinCount,
         configured: cryptoTotals.coinCount > 0,
       },
-      propertyEq: { value: 0, configured: false },
+      propertyEq: { value: propertyValue, configured: propertyConfigured },
       debt: {
         value: debtValue,
         accountCount: debtAccountCount,

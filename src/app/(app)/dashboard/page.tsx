@@ -150,10 +150,10 @@ export default async function Dashboard() {
           configured={data.stats.crypto.configured}
         />
         <StatCard
-          label="Property Equity"
-          value={formatCurrency(0, data.netWorth.currency)}
+          label="Property"
+          value={formatCurrency(data.stats.propertyEq.value, data.netWorth.currency)}
           gradient="from-violet-500/20 to-violet-500/5"
-          configured={false}
+          configured={data.stats.propertyEq.configured}
         />
         <StatCard
           label="Total Debt"

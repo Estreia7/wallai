@@ -1,12 +1,17 @@
-import { GlassCard } from "@/components/wallai/glass-card";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { PropertyList } from "@/components/wallai/property-list";
 
-export default function PropertyPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PropertyPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/");
+  }
   return (
     <div>
-      <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">Property</h2>
-      <GlassCard>
-        <p className="text-sm text-white/50">Track property valuations and equity over time. Coming soon.</p>
-      </GlassCard>
+      <PropertyList />
     </div>
   );
 }
