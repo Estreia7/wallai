@@ -2,9 +2,310 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
+import { LEARN_TRAITS, TRAIT_COUNT } from "../src/lib/wallai/learn/traits";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
+
+type SeedBook = {
+  externalId: string;      // Google Books volume ID
+  title: string;
+  author: string;
+  category: string;
+  year?: number;
+  coverUrl?: string;
+  description?: string;
+  traits: number[];        // length 20, values 0-10
+};
+
+// Scored by hand. Each vector is LEARN_TRAITS order. High values mark
+// pillars the book actually teaches; fill non-central traits with 0-3.
+const CURATED_BOOKS: SeedBook[] = [
+  {
+    externalId: "bK06kgAACAAJ",
+    title: "The Psychology of Money",
+    author: "Morgan Housel",
+    category: "mindset",
+    year: 2020,
+    coverUrl: "https://books.google.com/books/content?id=bK06kgAACAAJ&printsec=frontcover&img=1&zoom=1",
+    description: "Timeless lessons on wealth, greed, and happiness.",
+    //          bud sav dbt crd tax ins ret est emg rsk idx stk re  cry ent psy fru pas mac fi
+    traits:    [  2,  4,  1,  0,  0,  0,  3,  0,  2,  7,  4,  3,  1,  1,  2,  10, 3,  2,  3,  6],
+  },
+  {
+    externalId: "OMKrDwAAQBAJ",
+    title: "Rich Dad Poor Dad",
+    author: "Robert Kiyosaki",
+    category: "mindset",
+    year: 1997,
+    description: "Two fathers, two views of money; the asset/liability distinction.",
+    traits:    [  3,  3,  2,  1,  2,  1,  2,  1,  2,  6,  2,  3,  7,  0,  8,  9,  2,  8,  3,  7],
+  },
+  {
+    externalId: "LIjCwAEACAAJ",
+    title: "The Intelligent Investor",
+    author: "Benjamin Graham",
+    category: "investing",
+    year: 1949,
+    description: "Value investing principles from Warren Buffett's teacher.",
+    traits:    [  1,  2,  1,  0,  1,  0,  3,  1,  1,  9,  5,  10, 1,  0,  1,  6,  2,  1,  5,  5],
+  },
+  {
+    externalId: "kb0IBAAAQBAJ",
+    title: "A Random Walk Down Wall Street",
+    author: "Burton Malkiel",
+    category: "investing",
+    year: 1973,
+    description: "Efficient markets and the case for index funds.",
+    traits:    [  1,  2,  1,  0,  2,  0,  4,  0,  1,  8,  10, 6,  2,  0,  1,  4,  1,  2,  6,  4],
+  },
+  {
+    externalId: "dNq8yBjnzvMC",
+    title: "The Bogleheads' Guide to Investing",
+    author: "Taylor Larimore",
+    category: "investing",
+    year: 2006,
+    description: "Community wisdom on low-cost index investing.",
+    traits:    [  4,  6,  2,  1,  6,  2,  9,  3,  5,  7,  10, 3,  1,  0,  0,  4,  5,  2,  3,  9],
+  },
+  {
+    externalId: "dMZFDwAAQBAJ",
+    title: "The Millionaire Next Door",
+    author: "Thomas J. Stanley",
+    category: "mindset",
+    year: 1996,
+    description: "Who the rich really are — habits of accumulators.",
+    traits:    [  5,  9,  3,  2,  3,  2,  6,  3,  6,  5,  4,  2,  3,  0,  4,  8,  10, 3,  2,  8],
+  },
+  {
+    externalId: "8R-DCwAAQBAJ",
+    title: "Your Money or Your Life",
+    author: "Vicki Robin",
+    category: "mindset",
+    year: 1992,
+    description: "Redefine your relationship with money and time.",
+    traits:    [  6,  9,  4,  2,  3,  3,  5,  3,  7,  5,  6,  1,  1,  0,  1,  9,  10, 5,  2,  10],
+  },
+  {
+    externalId: "LvbXb3_nyEMC",
+    title: "I Will Teach You to Be Rich",
+    author: "Ramit Sethi",
+    category: "budgeting",
+    year: 2009,
+    description: "A 6-week program for twentysomethings.",
+    traits:    [  9,  8,  7,  8,  4,  3,  8,  2,  6,  5,  8,  2,  2,  0,  2,  7,  4,  3,  2,  6],
+  },
+  {
+    externalId: "pSeDDAAAQBAJ",
+    title: "The Simple Path to Wealth",
+    author: "JL Collins",
+    category: "investing",
+    year: 2016,
+    description: "Stock-series clarity: live below your means, invest in a total-market fund.",
+    traits:    [  5,  9,  3,  1,  4,  1,  7,  2,  6,  6,  10, 1,  1,  0,  0,  7,  8,  3,  3,  10],
+  },
+  {
+    externalId: "jPGJAgAAQBAJ",
+    title: "Think and Grow Rich",
+    author: "Napoleon Hill",
+    category: "mindset",
+    year: 1937,
+    description: "Classic mindset and goal-setting manual.",
+    traits:    [  1,  2,  1,  0,  0,  0,  1,  0,  1,  5,  1,  1,  1,  0,  7,  10, 1,  2,  1,  4],
+  },
+  {
+    externalId: "EmJDnwEACAAJ",
+    title: "The Richest Man in Babylon",
+    author: "George S. Clason",
+    category: "saving",
+    year: 1926,
+    description: "Parables on saving, investing, and debt.",
+    traits:    [  7,  10, 7,  2,  1,  2,  3,  2,  5,  4,  2,  1,  2,  0,  3,  6,  8,  3,  1,  6],
+  },
+  {
+    externalId: "vYylw2fMOCYC",
+    title: "The Total Money Makeover",
+    author: "Dave Ramsey",
+    category: "debt",
+    year: 2003,
+    description: "Seven baby steps out of debt.",
+    traits:    [  8,  8,  10, 7,  2,  4,  5,  2,  9,  4,  3,  0,  1,  0,  1,  6,  6,  1,  1,  5],
+  },
+  {
+    externalId: "Jf4oDwAAQBAJ",
+    title: "The Little Book of Common Sense Investing",
+    author: "John C. Bogle",
+    category: "investing",
+    year: 2007,
+    description: "The only way to guarantee your fair share of market returns.",
+    traits:    [  1,  3,  1,  0,  2,  0,  6,  1,  2,  6,  10, 3,  1,  0,  0,  4,  3,  2,  4,  6],
+  },
+  {
+    externalId: "TvHGDgAAQBAJ",
+    title: "One Up On Wall Street",
+    author: "Peter Lynch",
+    category: "investing",
+    year: 1989,
+    description: "How an amateur can use what they already know to pick stocks.",
+    traits:    [  1,  1,  1,  0,  1,  0,  3,  0,  1,  8,  3,  10, 2,  0,  2,  5,  2,  2,  4,  3],
+  },
+  {
+    externalId: "tZf3EAAAQBAJ",
+    title: "Security Analysis",
+    author: "Benjamin Graham",
+    category: "investing",
+    year: 1934,
+    description: "The definitive value-investing text.",
+    traits:    [  1,  1,  1,  0,  2,  0,  2,  1,  1,  9,  3,  10, 2,  0,  1,  3,  1,  1,  6,  3],
+  },
+  {
+    externalId: "zqtBY5X_Eq8C",
+    title: "The Wealthy Barber",
+    author: "David Chilton",
+    category: "mindset",
+    year: 1989,
+    description: "Common-sense financial planning in story form.",
+    traits:    [  7,  9,  5,  3,  4,  5,  7,  4,  6,  4,  5,  1,  3,  0,  1,  5,  7,  3,  2,  7],
+  },
+  {
+    externalId: "4gpfUI4avAEC",
+    title: "Millionaire Teacher",
+    author: "Andrew Hallam",
+    category: "investing",
+    year: 2011,
+    description: "Nine rules of wealth you should have learned in school.",
+    traits:    [  4,  8,  2,  1,  3,  1,  7,  2,  4,  6,  10, 2,  1,  0,  0,  6,  8,  2,  3,  8],
+  },
+  {
+    externalId: "xTQuDwAAQBAJ",
+    title: "Broke Millennial",
+    author: "Erin Lowry",
+    category: "budgeting",
+    year: 2017,
+    description: "Stop scraping by and get your financial life together.",
+    traits:    [  9,  8,  8,  9,  5,  3,  4,  1,  8,  4,  4,  1,  1,  0,  1,  6,  5,  1,  2,  5],
+  },
+  {
+    externalId: "OmLgDAAAQBAJ",
+    title: "The Index Card",
+    author: "Helaine Olen",
+    category: "investing",
+    year: 2016,
+    description: "Why personal finance doesn't have to be complicated.",
+    traits:    [  7,  8,  6,  4,  5,  6,  8,  4,  7,  5,  9,  1,  1,  0,  0,  5,  5,  2,  2,  7],
+  },
+  {
+    externalId: "71FyBQAAQBAJ",
+    title: "Money: Master the Game",
+    author: "Tony Robbins",
+    category: "investing",
+    year: 2014,
+    description: "Seven simple steps to financial freedom.",
+    traits:    [  5,  7,  4,  3,  5,  4,  8,  4,  5,  6,  8,  3,  2,  1,  3,  7,  4,  4,  4,  8],
+  },
+  {
+    externalId: "7lALCwAAQBAJ",
+    title: "The Barefoot Investor",
+    author: "Scott Pape",
+    category: "budgeting",
+    year: 2016,
+    description: "The only money guide you'll ever need.",
+    traits:    [  10, 9,  7,  6,  4,  6,  8,  3,  9,  4,  7,  1,  2,  0,  1,  5,  6,  2,  1,  7],
+  },
+  {
+    externalId: "d5k_DwAAQBAJ",
+    title: "Financial Freedom",
+    author: "Grant Sabatier",
+    category: "mindset",
+    year: 2019,
+    description: "A proven path to all the money you will ever need.",
+    traits:    [  6,  8,  5,  3,  4,  3,  5,  2,  6,  6,  7,  2,  4,  0,  6,  7,  6,  6,  2,  10],
+  },
+  {
+    externalId: "2wJHzQEACAAJ",
+    title: "Die With Zero",
+    author: "Bill Perkins",
+    category: "mindset",
+    year: 2020,
+    description: "Getting all you can from your money and your life.",
+    traits:    [  3,  4,  2,  1,  2,  2,  7,  6,  3,  5,  3,  1,  1,  0,  1,  9,  2,  3,  2,  6],
+  },
+  {
+    externalId: "z8VmDwAAQBAJ",
+    title: "The Psychology of Investing",
+    author: "John R. Nofsinger",
+    category: "investing",
+    year: 2001,
+    description: "Behavioral finance for everyday investors.",
+    traits:    [  1,  2,  1,  0,  1,  0,  3,  0,  1,  9,  6,  7,  1,  1,  1,  10, 2,  2,  4,  3],
+  },
+  {
+    externalId: "AB86CAAAQBAJ",
+    title: "Unshakeable",
+    author: "Tony Robbins",
+    category: "investing",
+    year: 2017,
+    description: "Your financial freedom playbook.",
+    traits:    [  3,  5,  2,  1,  3,  2,  7,  2,  3,  7,  8,  2,  1,  0,  2,  8,  3,  3,  5,  7],
+  },
+  {
+    externalId: "nG5zBgAAQBAJ",
+    title: "The 4-Hour Workweek",
+    author: "Timothy Ferriss",
+    category: "entrepreneurship",
+    year: 2007,
+    description: "Escape 9-5, live anywhere, join the new rich.",
+    traits:    [  2,  3,  1,  0,  1,  0,  1,  0,  1,  6,  1,  1,  1,  0,  10, 7,  3,  9,  1,  7],
+  },
+  {
+    externalId: "tJjBDwAAQBAJ",
+    title: "Set for Life",
+    author: "Scott Trench",
+    category: "mindset",
+    year: 2017,
+    description: "Dominate life, money, and the American dream.",
+    traits:    [  7,  8,  5,  3,  3,  2,  4,  1,  6,  6,  5,  1,  9,  0,  5,  6,  7,  7,  2,  9],
+  },
+  {
+    externalId: "0SRjDwAAQBAJ",
+    title: "Quit Like a Millionaire",
+    author: "Kristy Shen",
+    category: "investing",
+    year: 2019,
+    description: "No gimmicks, luck, or trust fund required.",
+    traits:    [  6,  9,  3,  2,  6,  2,  7,  2,  5,  6,  10, 2,  2,  0,  1,  7,  9,  3,  4,  10],
+  },
+  {
+    externalId: "dkl_qjE_u68C",
+    title: "Early Retirement Extreme",
+    author: "Jacob Lund Fisker",
+    category: "frugality",
+    year: 2010,
+    description: "A philosophical and practical guide to financial independence.",
+    traits:    [  8,  10, 4,  2,  4,  2,  5,  2,  7,  4,  7,  1,  2,  0,  2,  8,  10, 4,  4,  10],
+  },
+  {
+    externalId: "OBnZzQEACAAJ",
+    title: "The Millionaire Fastlane",
+    author: "MJ DeMarco",
+    category: "entrepreneurship",
+    year: 2011,
+    description: "Crack the code to wealth and live rich for a lifetime.",
+    traits:    [  2,  3,  3,  1,  2,  1,  2,  1,  2,  7,  1,  1,  5,  0,  10, 8,  2,  8,  3,  7],
+  },
+];
+
+// Sanity check every vector at startup.
+for (const b of CURATED_BOOKS) {
+  if (b.traits.length !== TRAIT_COUNT) {
+    throw new Error(`Seed book "${b.title}" has ${b.traits.length} traits, expected ${TRAIT_COUNT}`);
+  }
+  for (const n of b.traits) {
+    if (n < 0 || n > 10) {
+      throw new Error(`Seed book "${b.title}" has out-of-range trait: ${n}`);
+    }
+  }
+}
 
 async function main() {
   const passwordHash = await bcrypt.hash("1234", 12);
@@ -50,62 +351,25 @@ async function main() {
     console.log(`Financial tips already exist (${existingCount}), skipping`);
   }
 
-  // Seed books
-  const books = [
-    {
-      title: "Rich Dad Poor Dad",
-      author: "Robert Kiyosaki",
-      description: "What the rich teach their kids about money that the poor and middle class do not.",
-      year: 1997,
-      category: "mindset",
-      coverUrl: "https://m.media-amazon.com/images/I/81bsw6fnUiL._AC_UF1000,1000_QL80_.jpg",
-      link: "https://www.amazon.com/Rich-Dad-Poor-Teach-Middle/dp/1612680194",
-    },
-    {
-      title: "The Psychology of Money",
-      author: "Morgan Housel",
-      description: "Timeless lessons on wealth, greed, and happiness. How behavior matters more than knowledge in finance.",
-      year: 2020,
-      category: "mindset",
-      coverUrl: "https://m.media-amazon.com/images/I/81Dky+tD+pL._AC_UF1000,1000_QL80_.jpg",
-      link: "https://www.amazon.com/Psychology-Money-Timeless-lessons-happiness/dp/0857197681",
-    },
-    {
-      title: "The Intelligent Investor",
-      author: "Benjamin Graham",
-      description: "The definitive book on value investing. A practical guide that has inspired investors for decades.",
-      year: 1949,
-      category: "investing",
-      coverUrl: "https://m.media-amazon.com/images/I/91yj3mbz4JL._AC_UF1000,1000_QL80_.jpg",
-      link: "https://www.amazon.com/Intelligent-Investor-Definitive-Investing-Essentials/dp/0060555661",
-    },
-    {
-      title: "I Will Teach You to Be Rich",
-      author: "Ramit Sethi",
-      description: "A practical, no-guilt system for automating your finances. Covers banking, saving, budgeting, and investing.",
-      year: 2009,
-      category: "budgeting",
-      coverUrl: "https://m.media-amazon.com/images/I/71aG0m9XRcL._AC_UF1000,1000_QL80_.jpg",
-      link: "https://www.amazon.com/Will-Teach-You-Rich-Second/dp/1523505745",
-    },
-    {
-      title: "The Total Money Makeover",
-      author: "Dave Ramsey",
-      description: "A proven plan for financial fitness. Baby steps to get out of debt and build wealth.",
-      year: 2003,
-      category: "budgeting",
-      coverUrl: "https://m.media-amazon.com/images/I/71JtMIagpPL._AC_UF1000,1000_QL80_.jpg",
-      link: "https://www.amazon.com/Total-Money-Makeover-Classic-Financial/dp/1595555277",
-    },
-  ];
-
-  const existingBooks = await prisma.book.count();
-  if (existingBooks === 0) {
-    await prisma.book.createMany({ data: books });
-    console.log(`Seeded ${books.length} books`);
-  } else {
-    console.log(`Books already exist (${existingBooks}), skipping`);
+  // Wipe then re-seed to guarantee the curated catalogue matches the codebase.
+  await prisma.book.deleteMany({});
+  for (const b of CURATED_BOOKS) {
+    await prisma.book.create({
+      data: {
+        externalId: b.externalId,
+        title: b.title,
+        author: b.author,
+        category: b.category,
+        year: b.year ?? null,
+        coverUrl: b.coverUrl ?? null,
+        description: b.description ?? null,
+        traits: b.traits,
+        traitSource: "curated",
+        traitsGeneratedAt: new Date(),
+      },
+    });
   }
+  console.log(`Seeded ${CURATED_BOOKS.length} curated books.`);
 }
 
 main()
