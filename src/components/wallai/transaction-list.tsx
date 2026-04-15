@@ -131,53 +131,51 @@ export function TransactionList({
           {transactions.map((tx) => (
             <div
               key={tx.id}
-              className="group flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5 hover:bg-white/5"
+              className="group flex flex-col gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5 hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
             >
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="truncate text-xs font-medium text-white/90 sm:text-sm">
-                    {tx.description}
-                  </p>
-                </div>
+                <p className="truncate text-xs font-medium text-white/90 sm:text-sm">
+                  {tx.description}
+                </p>
                 <div className="mt-0.5 flex items-center gap-2 text-[10px] text-white/30">
                   <span>{new Date(tx.date).toLocaleDateString()}</span>
-                  {tx.bankAccount && <span>• {tx.bankAccount.name}</span>}
+                  {tx.bankAccount && <span className="truncate">• {tx.bankAccount.name}</span>}
                 </div>
               </div>
 
-              <select
-                value={tx.category || ""}
-                onChange={(e) => updateCategory(tx.id, e.target.value)}
-                className="w-24 rounded-md border border-white/10 bg-white/5 px-1.5 py-1 text-[10px] text-white/70 outline-none focus:border-white/20 sm:w-28"
-              >
-                <option value="">Uncategorized</option>
-                {COMMON_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between gap-2 sm:justify-end sm:gap-3">
+                <select
+                  value={tx.category || ""}
+                  onChange={(e) => updateCategory(tx.id, e.target.value)}
+                  className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-1.5 py-1 text-[10px] text-white/70 outline-none focus:border-white/20 sm:w-28 sm:flex-none"
+                >
+                  <option value="">Uncategorized</option>
+                  {COMMON_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
 
-              <div className="text-right">
                 <p
-                  className={`text-xs font-semibold sm:text-sm ${
+                  className={`shrink-0 text-right text-xs font-semibold tabular-nums sm:text-sm ${
                     tx.amount >= 0 ? "text-emerald-400" : "text-white"
                   }`}
                 >
                   {tx.amount >= 0 ? "+" : ""}
                   {tx.amount.toFixed(2)} {tx.currency}
                 </p>
-              </div>
 
-              <button
-                onClick={() => deleteTransaction(tx.id)}
-                className="rounded p-1 text-white/20 opacity-0 transition-opacity hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
-                aria-label="Delete"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+                <button
+                  onClick={() => deleteTransaction(tx.id)}
+                  className="shrink-0 rounded p-1.5 text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400 sm:text-white/20 sm:opacity-0 sm:group-hover:opacity-100"
+                  aria-label="Delete"
+                >
+                  <svg className="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>

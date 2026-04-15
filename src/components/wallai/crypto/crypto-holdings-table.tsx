@@ -93,7 +93,72 @@ export function CryptoHoldingsTable({
         <h3 className="mb-3 text-xs font-semibold text-white/70 sm:mb-4 sm:text-sm">
           Holdings
         </h3>
-        <div className="overflow-x-auto">
+        {/* Mobile: stacked cards */}
+        <div className="space-y-2 sm:hidden">
+          {holdings.map((h) => {
+            const pnlColor =
+              h.pnlEur > 0
+                ? "text-emerald-400"
+                : h.pnlEur < 0
+                  ? "text-red-400"
+                  : "text-white/40";
+            return (
+              <div
+                key={h.id}
+                className="rounded-xl border border-white/5 bg-white/[0.02] p-3"
+              >
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white">{h.symbol}</div>
+                    <div className="truncate text-[10px] text-white/40">{h.name}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-white tabular-nums">
+                      {formatCurrency(h.valueEur)}
+                    </div>
+                    <div className={`text-[10px] tabular-nums ${pnlColor}`}>
+                      {h.pnlEur >= 0 ? "+" : ""}
+                      {formatCurrency(h.pnlEur)} ({formatPct(h.pnlPct)})
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 border-t border-white/5 pt-2 text-[11px]">
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/30">Qty</div>
+                    <div className="text-white/80 tabular-nums">{formatQty(h.quantity)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/30">Avg cost</div>
+                    <div className="text-white/80 tabular-nums">{formatCurrency(h.avgCostEur)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/30">Price</div>
+                    <div className="text-white/80 tabular-nums">
+                      {h.priceEur !== null ? formatCurrency(h.priceEur) : <span className="text-amber-400">—</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-2 flex justify-end gap-1 border-t border-white/5 pt-2">
+                  <button
+                    onClick={() => openEdit(h)}
+                    className="rounded-md px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 hover:text-white"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteHolding(h)}
+                    className="rounded-md px-3 py-1.5 text-xs text-white/70 hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-white/10 text-left text-white/40">
