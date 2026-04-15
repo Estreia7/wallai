@@ -293,6 +293,7 @@ model UserBook {
 
   @@unique([userId, bookId])
   @@index([userId])
+  @@index([bookId])
 }
 
 model UserBookHidden {
@@ -305,6 +306,7 @@ model UserBookHidden {
 
   @@id([userId, bookId])
   @@index([userId])
+  @@index([bookId])
 }
 
 model FinancialTip {
