@@ -14,20 +14,25 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({}));
   const googleId = typeof body?.googleId === "string" ? body.googleId : "";
+  const bookId = typeof body?.bookId === "string" ? body.bookId : "";
   const status = typeof body?.status === "string" ? body.status : "wantToRead";
   const rating =
     typeof body?.rating === "number" && body.rating >= 1 && body.rating <= 5
       ? body.rating
       : null;
 
-  if (!googleId) return NextResponse.json({ error: "googleId required" }, { status: 400 });
+  if (!googleId && !bookId) {
+    return NextResponse.json({ error: "googleId or bookId required" }, { status: 400 });
+  }
   if (!ALLOWED_STATUSES.has(status)) {
     return NextResponse.json({ error: "invalid status" }, { status: 400 });
   }
 
-  let book = await prisma.book.findUnique({ where: { externalId: googleId } });
+  let book = bookId
+    ? await prisma.book.findUnique({ where: { id: bookId } })
+    : await prisma.book.findUnique({ where: { externalId: googleId } });
 
-  if (!book) {
+  if (!book && googleId) {
     const searchResults = await searchGoogleBooks(googleId, 1);
     const hit = searchResults.find((h) => h.googleId === googleId) ?? searchResults[0];
     if (!hit) {
@@ -47,6 +52,10 @@ export async function POST(request: Request) {
         traitSource: null,
       },
     });
+  }
+
+  if (!book) {
+    return NextResponse.json({ error: "book not found" }, { status: 404 });
   }
 
   if (book.traits.length !== 20) {
