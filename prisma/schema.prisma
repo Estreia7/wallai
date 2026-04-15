@@ -32,6 +32,8 @@ model User {
   chatMessages    ChatMessage[]
   apiUsages       ApiUsage[]
   netWorthSnapshots NetWorthSnapshot[]
+  userBooks         UserBook[]
+  hiddenBooks       UserBookHidden[]
 
   anthropicKeyEncrypted String?
 }
@@ -258,14 +260,51 @@ model ApiUsage {
 // ── Education ────────────────────────────────────────
 
 model Book {
-  id          String @id @default(cuid())
-  title       String
-  author      String
-  coverUrl    String?
-  description String? @db.Text
-  year        Int?
-  category    String
-  link        String?
+  id                String   @id @default(cuid())
+  title             String
+  author            String
+  coverUrl          String?
+  description       String?  @db.Text
+  year              Int?
+  category          String
+  link              String?
+  traits            Float[]  // length 20, same order as LEARN_TRAITS
+  traitSource       String?  // "curated" | "ai"
+  traitsGeneratedAt DateTime?
+  externalId        String?  @unique
+
+  userBooks     UserBook[]
+  hiddenByUsers UserBookHidden[]
+
+  @@index([externalId])
+}
+
+model UserBook {
+  id         String    @id @default(cuid())
+  userId     String
+  bookId     String
+  status     String    // "reading" | "read" | "wantToRead"
+  rating     Int?      // 1-5
+  addedAt    DateTime  @default(now())
+  finishedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+}
+
+model UserBookHidden {
+  userId   String
+  bookId   String
+  hiddenAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([userId, bookId])
+  @@index([userId])
 }
 
 model FinancialTip {
