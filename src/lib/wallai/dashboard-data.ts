@@ -73,6 +73,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   const [
     user,
     bankAccounts,
+    debts,
     thisMonthSumRow,
     monthlyDeltaRows,
     recentWindowTransactions,
@@ -88,6 +89,10 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     prisma.bankAccount.findMany({
       where: { userId },
       select: { id: true, currency: true, type: true, currentBalance: true },
+    }),
+    prisma.debt.findMany({
+      where: { userId },
+      select: { id: true, currency: true, currentBalance: true },
     }),
     prisma.transaction.aggregate({
       where: { userId, date: { gte: startOfThisMonth } },
@@ -158,9 +163,13 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
 
   const cashValue = cashAccounts.reduce((sum, a) => sum + a.currentBalance, 0);
   const creditSigned = creditAccounts.reduce((sum, a) => sum + a.currentBalance, 0); // negative for debt
-  const debtValue = -creditSigned; // positive number for display
+  const creditCardDebt = -creditSigned; // positive number
+  const loanDebt = debts.reduce((sum, d) => sum + d.currentBalance, 0);
+  const debtValue = creditCardDebt + loanDebt;
+  const debtAccountCount = creditAccounts.length + debts.length;
 
-  const netWorthTotal = cashValue + creditSigned + cryptoTotals.totalValueEur; // creditSigned already negative if debt
+  const netWorthTotal =
+    cashValue + creditSigned - loanDebt + cryptoTotals.totalValueEur;
 
   /* ── Net worth change calc (end of last month) ─────── */
 
@@ -250,8 +259,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       propertyEq: { value: 0, configured: false },
       debt: {
         value: debtValue,
-        accountCount: creditAccounts.length,
-        configured: creditAccounts.length > 0,
+        accountCount: debtAccountCount,
+        configured: debtAccountCount > 0,
       },
     },
     netWorthTrend,

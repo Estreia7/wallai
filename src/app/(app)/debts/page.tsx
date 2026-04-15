@@ -1,12 +1,17 @@
-import { GlassCard } from "@/components/wallai/glass-card";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { DebtList } from "@/components/wallai/debt-list";
 
-export default function DebtsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DebtsPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/");
+  }
   return (
     <div>
-      <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">Debts & Loans</h2>
-      <GlassCard>
-        <p className="text-sm text-white/50">Manage your mortgage, loans, and credit cards. Coming soon.</p>
-      </GlassCard>
+      <DebtList />
     </div>
   );
 }
