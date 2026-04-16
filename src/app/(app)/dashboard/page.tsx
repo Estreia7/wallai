@@ -44,20 +44,20 @@ function DashboardHeader({ name }: { name: string | null }) {
   }).format(new Date());
 
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h2 className="text-xl font-bold text-white sm:text-2xl">
+    <div className="mb-6 flex items-start justify-between gap-3 sm:mb-8 sm:items-center">
+      <div className="min-w-0 flex-1">
+        <h2 className="truncate text-xl font-bold text-white sm:text-2xl">
           Good morning, {displayName}
         </h2>
         <p className="mt-0.5 text-xs text-white/40 sm:mt-1 sm:text-sm">
           Here&apos;s your financial overview
         </p>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/50 backdrop-blur-lg sm:px-4 sm:py-2 sm:text-sm">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="hidden rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/50 sm:block sm:px-4 sm:py-2 sm:text-sm">
           {monthYear}
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 text-xs font-bold text-[#0A0E1A] sm:h-10 sm:w-10 sm:text-sm">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 text-xs font-bold text-[#0A0E1A] sm:h-10 sm:w-10 sm:text-sm">
           {initial}
         </div>
       </div>

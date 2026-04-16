@@ -13,7 +13,7 @@ type Book = {
 
 export function BookCard({ book }: { book: Book }) {
   const content = (
-    <div className="flex h-full flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-all hover:border-white/20 hover:bg-white/[0.06] sm:flex-row sm:gap-4">
+    <div className="flex h-full flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors sm:hover:border-white/20 sm:hover:bg-white/[0.06] sm:flex-row sm:gap-4">
       <div className="relative mx-auto aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-lg bg-white/5 sm:mx-0 sm:w-20">
         {book.coverUrl ? (
           <Image

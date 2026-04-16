@@ -26,7 +26,7 @@ export function PeriodTabs({ active }: { active: 3 | 6 | 12 }) {
           key={opt.value}
           href={hrefFor(opt.value)}
           scroll={false}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-lg px-3 py-2 text-xs font-medium transition-colors sm:py-1.5 ${
             active === opt.value
               ? "bg-white/10 text-white"
               : "text-white/50 hover:text-white"

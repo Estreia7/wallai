@@ -22,7 +22,7 @@ export function AllocationDonut({ data, currency }: AllocationDonutProps) {
   });
 
   return (
-    <GlassCard className="relative overflow-hidden">
+    <GlassCard className="relative min-h-[260px] overflow-hidden">
       <h3 className="mb-3 text-xs font-semibold text-white/70 sm:mb-4 sm:text-sm">
         Asset Allocation
       </h3>
@@ -47,7 +47,7 @@ export function AllocationDonut({ data, currency }: AllocationDonutProps) {
               if (!active || !payload?.length) return null;
               const d = payload[0].payload as { name: string; value: number };
               return (
-                <div className="rounded-lg border border-white/10 bg-[#0A0E1A]/90 px-3 py-2 text-xs backdrop-blur-lg">
+                <div className="rounded-lg border border-white/10 bg-[#0A0E1A]/90 px-3 py-2 text-xs">
                   <p className="text-white/50">{d.name}</p>
                   <p className="font-semibold text-white">{fmt.format(d.value)}</p>
                 </div>

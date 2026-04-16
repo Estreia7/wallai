@@ -52,7 +52,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             return (
               <div
                 key={tx.id}
-                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/5 sm:px-4 sm:py-3"
+                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5 transition-colors sm:px-4 sm:py-3 sm:hover:bg-white/5"
               >
                 <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                   <div

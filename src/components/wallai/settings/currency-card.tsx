@@ -53,7 +53,7 @@ export function CurrencyCard({ initialCurrency }: CurrencyCardProps) {
         value={currency}
         onChange={(e) => handleChange(e.target.value)}
         disabled={saving}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-all focus:border-emerald-400/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-400/30 disabled:opacity-40"
+        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none transition-colors focus:border-emerald-400/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-400/30 disabled:opacity-40"
       >
         {CURRENCIES.map((c) => (
           <option key={c.code} value={c.code} className="bg-[#0A0E1A] text-white">

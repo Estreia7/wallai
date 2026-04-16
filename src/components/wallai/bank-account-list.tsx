@@ -374,7 +374,7 @@ function GroupBlock({
                         e.stopPropagation();
                         onEditAccount(account);
                       }}
-                      className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-8 sm:w-8 sm:hover:bg-white/10 sm:hover:text-white"
                       aria-label="Edit"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -386,7 +386,7 @@ function GroupBlock({
                         e.stopPropagation();
                         onDeleteAccount(account);
                       }}
-                      className="rounded-lg p-1.5 text-white/40 hover:bg-red-500/10 hover:text-red-400"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-8 sm:w-8 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                       aria-label="Delete"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

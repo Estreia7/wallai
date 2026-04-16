@@ -60,7 +60,12 @@ export function LearnClient({ initial }: { initial: Payload }) {
   }, []);
 
   useEffect(() => {
+    let lastReloadAt = Date.now();
+    const STALE_MS = 60_000;
     function onFocus() {
+      const now = Date.now();
+      if (now - lastReloadAt < STALE_MS) return;
+      lastReloadAt = now;
       reload();
     }
     window.addEventListener("focus", onFocus);

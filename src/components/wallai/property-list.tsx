@@ -87,7 +87,7 @@ function PropertyCard({
   }
 
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.04]">
+    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors sm:hover:bg-white/[0.04]">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-sm font-semibold text-white sm:text-base">

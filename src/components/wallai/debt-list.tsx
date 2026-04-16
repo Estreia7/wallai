@@ -68,7 +68,7 @@ function DebtCard({
   );
 
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.04]">
+    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors sm:hover:bg-white/[0.04]">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">

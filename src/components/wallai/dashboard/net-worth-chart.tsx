@@ -35,7 +35,7 @@ function ChartTooltip({
   if (!active || !payload?.length) return null;
   const p = payload[0];
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0A0E1A]/90 px-3 py-2 text-xs backdrop-blur-lg">
+    <div className="rounded-lg border border-white/10 bg-[#0A0E1A]/90 px-3 py-2 text-xs">
       <p className="text-white/50">{p.payload.month}</p>
       <p className="font-semibold text-white">
         {new Intl.NumberFormat("en-IE", {
@@ -78,6 +78,8 @@ export function NetWorthChart({ data, currency }: NetWorthChartProps) {
               dataKey="label"
               stroke="rgba(255,255,255,0.2)"
               tick={{ fontSize: 11 }}
+              interval="preserveStartEnd"
+              minTickGap={16}
             />
             <YAxis
               stroke="rgba(255,255,255,0.2)"

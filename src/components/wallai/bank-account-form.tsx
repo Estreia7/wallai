@@ -210,7 +210,7 @@ export function BankAccountForm({
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:brightness-110 disabled:opacity-40"
+          className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-colors hover:brightness-110 disabled:opacity-40"
         >
           {saving ? "Saving..." : "Save"}
         </button>

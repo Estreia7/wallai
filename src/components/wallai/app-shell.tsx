@@ -53,7 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <GradientBg />
       <NavMobile onLogout={handleLogout} />
       <NavSidebar onLogout={handleLogout} />
-      <main className="relative z-10 px-4 pb-8 pt-[73px] sm:px-6 lg:ml-64 lg:p-8">
+      <main className="relative z-0 px-4 pb-8 pt-[calc(3.5rem+env(safe-area-inset-top)+1rem)] sm:px-6 lg:ml-64 lg:p-8 lg:pt-8">
         {children}
       </main>
     </div>

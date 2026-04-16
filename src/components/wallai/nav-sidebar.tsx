@@ -49,7 +49,7 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all ${
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-colors ${
                 isActive
                   ? "bg-white/10 text-white shadow-lg shadow-white/5"
                   : "text-white/40 hover:bg-white/5 hover:text-white/70"
@@ -65,7 +65,7 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
       <div className="border-t border-white/5 p-3">
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-white/40 transition-all hover:bg-red-500/10 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
         >
           <LogoutIcon />
           Sign out

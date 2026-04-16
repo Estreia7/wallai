@@ -61,7 +61,7 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
   return (
     <>
       {/* Top header bar */}
-      <header className="fixed left-0 right-0 top-0 z-30 flex items-center justify-between border-b border-white/5 bg-[#0A0E1A]/80 px-4 py-3 backdrop-blur-2xl lg:hidden">
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-white/5 bg-[#0A0E1A]/80 px-4 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400">
             <span className="text-xs font-bold text-[#0A0E1A]">W</span>
@@ -72,7 +72,7 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
         </div>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="rounded-lg p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-white/60 transition-colors sm:hover:bg-white/10 sm:hover:text-white"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -82,19 +82,16 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
       {/* Backdrop overlay */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 top-14 z-30 bg-black/60 lg:hidden"
           onClick={() => setMenuOpen(false)}
         />
       )}
 
       {/* Slide-down menu panel */}
       <nav
-        className={`fixed left-0 right-0 top-[57px] z-25 transform border-b border-white/5 bg-[#0A0E1A]/95 backdrop-blur-2xl transition-all duration-300 ease-in-out lg:hidden ${
-          menuOpen
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-full opacity-0 pointer-events-none"
+        className={`fixed left-0 right-0 top-14 z-40 transform border-b border-white/5 bg-[#0A0E1A]/95 backdrop-blur-xl transition-transform duration-200 ease-out lg:hidden ${
+          menuOpen ? "translate-y-0" : "-translate-y-full pointer-events-none"
         }`}
-        style={{ zIndex: 25 }}
       >
         <div className="space-y-1 p-3">
           {navItems.map((item) => {
@@ -103,10 +100,10 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all ${
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${
                   isActive
                     ? "bg-white/10 text-white"
-                    : "text-white/40 hover:bg-white/5 hover:text-white/70"
+                    : "text-white/60 sm:hover:bg-white/5 sm:hover:text-white/80"
                 }`}
               >
                 {item.icon}
@@ -120,7 +117,7 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
               setMenuOpen(false);
               onLogout();
             }}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/40 transition-all hover:bg-red-500/10 hover:text-red-400"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/60 transition-colors sm:hover:bg-red-500/10 sm:hover:text-red-400"
           >
             <LogoutIcon />
             Sign out

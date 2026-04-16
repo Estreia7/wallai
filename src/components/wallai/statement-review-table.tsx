@@ -253,18 +253,14 @@ export function StatementReviewTable({
                   </span>
                 </div>
                 <div className="flex shrink-0 items-center gap-2 text-right text-[10px] sm:gap-3 sm:text-xs">
-                  <div>
-                    <p className="text-[9px] uppercase tracking-wider text-white/30 sm:text-[10px]">
-                      In
-                    </p>
+                  <div className="hidden sm:block">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30">In</p>
                     <p className="font-semibold text-emerald-400">
                       {fmt(group.income, primaryCurrency)}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-[9px] uppercase tracking-wider text-white/30 sm:text-[10px]">
-                      Out
-                    </p>
+                  <div className="hidden sm:block">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30">Out</p>
                     <p className="font-semibold text-red-400">
                       {fmt(group.expenses, primaryCurrency)}
                     </p>
@@ -310,19 +306,20 @@ export function StatementReviewTable({
                         <div className="flex shrink-0 items-center gap-1.5">
                           <input
                             type="number"
+                            inputMode="decimal"
                             step="0.01"
                             value={row.amount}
                             onChange={(e) =>
                               updateRow(i, { amount: parseFloat(e.target.value) || 0 })
                             }
-                            className={`w-20 rounded-md border border-transparent bg-transparent px-1 py-0.5 text-right text-xs outline-none focus:border-white/20 focus:bg-white/5 sm:w-24 sm:text-sm ${
+                            className={`w-16 rounded-md border border-transparent bg-transparent px-1 py-0.5 text-right text-xs outline-none focus:border-white/20 focus:bg-white/5 sm:w-24 sm:text-sm ${
                               row.amount >= 0 ? "text-emerald-400" : "text-white"
                             }`}
                           />
                           <button
                             type="button"
                             onClick={() => removeRow(i)}
-                            className="rounded p-1 text-white/30 hover:bg-red-500/10 hover:text-red-400"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-7 sm:w-7 sm:text-white/30 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                             aria-label="Remove"
                           >
                             <svg
@@ -350,7 +347,10 @@ export function StatementReviewTable({
         })}
       </div>
 
-      <div className="sticky bottom-0 -mx-4 -mb-4 flex gap-2 border-t border-white/10 bg-[#0A0E1A]/95 px-4 py-3 backdrop-blur-lg sm:-mx-6 sm:-mb-6 sm:px-6 sm:py-4">
+      <div
+        className="sticky bottom-0 -mx-4 -mb-4 flex gap-2 border-t border-white/10 bg-[#0A0E1A]/95 px-4 py-3 backdrop-blur-lg sm:-mx-6 sm:-mb-6 sm:px-6 sm:py-4"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
+      >
         <button
           onClick={submit}
           disabled={saving}

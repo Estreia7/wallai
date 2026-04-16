@@ -162,7 +162,7 @@ export function TransactionList({
                 <select
                   value={tx.category || ""}
                   onChange={(e) => updateCategory(tx.id, e.target.value)}
-                  className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-1.5 py-1 text-[10px] text-white/70 outline-none focus:border-white/20 sm:w-28 sm:flex-none"
+                  className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-2 py-2 text-xs text-white/70 outline-none focus:border-white/20 sm:w-28 sm:flex-none sm:px-1.5 sm:py-1 sm:text-[10px]"
                 >
                   <option value="">Uncategorized</option>
                   {COMMON_CATEGORIES.map((c) => (
@@ -183,7 +183,7 @@ export function TransactionList({
 
                 <button
                   onClick={() => deleteTransaction(tx.id)}
-                  className="shrink-0 rounded p-1.5 text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400 sm:text-white/20 sm:opacity-0 sm:group-hover:opacity-100"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white/40 transition-colors sm:h-7 sm:w-7 sm:text-white/20 sm:opacity-0 sm:group-hover:opacity-100 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                   aria-label="Delete"
                 >
                   <svg className="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
