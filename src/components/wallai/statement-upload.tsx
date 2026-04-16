@@ -22,10 +22,12 @@ type ParseResult = {
 export function StatementUpload({
   bankAccountId,
   bankAccountName,
+  disabledReason,
   onImported,
 }: {
   bankAccountId: string | null;
   bankAccountName: string | null;
+  disabledReason?: string | null;
   onImported: () => void;
 }) {
   const [uploading, setUploading] = useState(false);
@@ -152,7 +154,9 @@ export function StatementUpload({
         <h3 className="mb-3 text-sm font-semibold text-white">Upload Statement</h3>
 
         {!bankAccountId ? (
-          <p className="text-xs text-white/40">Select a bank account above to upload statements.</p>
+          <p className="text-xs text-white/40">
+            {disabledReason ?? "Select a bank account above to upload statements."}
+          </p>
         ) : (
           <>
             <label

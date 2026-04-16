@@ -18,9 +18,11 @@ const COMMON_CATEGORIES = ALL_CATEGORIES;
 
 export function TransactionList({
   bankAccountId,
+  institutionId,
   refreshToken,
 }: {
   bankAccountId: string | null;
+  institutionId?: string | null;
   refreshToken: number;
 }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -32,14 +34,18 @@ export function TransactionList({
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (bankAccountId) params.set("bankAccountId", bankAccountId);
+    if (bankAccountId) {
+      params.set("bankAccountId", bankAccountId);
+    } else if (institutionId) {
+      params.set("institutionId", institutionId);
+    }
     if (categoryFilter) params.set("category", categoryFilter);
 
     const res = await fetch(`/api/wallai/transactions?${params}`);
     const data = await res.json();
     setTransactions(data.transactions || []);
     setLoading(false);
-  }, [bankAccountId, categoryFilter]);
+  }, [bankAccountId, institutionId, categoryFilter]);
 
   useEffect(() => {
     load();
@@ -124,7 +130,9 @@ export function TransactionList({
         <p className="text-xs text-white/40">Loading...</p>
       ) : transactions.length === 0 ? (
         <p className="text-xs text-white/40">
-          {bankAccountId ? "No transactions for this account yet." : "Select an account to view transactions."}
+          {bankAccountId || institutionId
+            ? "No transactions yet."
+            : "Select an account or institution to view transactions."}
         </p>
       ) : (
         <div className="space-y-2">
@@ -139,7 +147,14 @@ export function TransactionList({
                 </p>
                 <div className="mt-0.5 flex items-center gap-2 text-[10px] text-white/30">
                   <span>{new Date(tx.date).toLocaleDateString()}</span>
-                  {tx.bankAccount && <span className="truncate">• {tx.bankAccount.name}</span>}
+                  {(institutionId || !bankAccountId) && tx.bankAccount && (
+                    <span className="truncate rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] text-white/50">
+                      {tx.bankAccount.name}
+                    </span>
+                  )}
+                  {!institutionId && bankAccountId && tx.bankAccount && (
+                    <span className="truncate">• {tx.bankAccount.name}</span>
+                  )}
                 </div>
               </div>
 

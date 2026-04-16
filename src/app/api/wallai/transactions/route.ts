@@ -11,13 +11,18 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const bankAccountId = url.searchParams.get("bankAccountId");
+  const institutionId = url.searchParams.get("institutionId");
   const category = url.searchParams.get("category");
   const from = url.searchParams.get("from");
   const to = url.searchParams.get("to");
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "100", 10), 500);
 
   const where: Prisma.TransactionWhereInput = { userId: session.user.id };
-  if (bankAccountId) where.bankAccountId = bankAccountId;
+  if (bankAccountId) {
+    where.bankAccountId = bankAccountId;
+  } else if (institutionId) {
+    where.bankAccount = { institutionId };
+  }
   if (category) where.category = category;
   if (from || to) {
     where.date = {};

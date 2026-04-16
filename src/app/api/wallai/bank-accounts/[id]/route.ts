@@ -24,6 +24,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     currency?: string;
     type?: string;
     currentBalance?: number;
+    institutionId?: string | null;
   } = {};
   if (typeof body?.name === "string" && body.name.trim()) data.name = body.name.trim();
   if (typeof body?.currency === "string" && body.currency.trim().length === 3) {
@@ -34,6 +35,22 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
   if (typeof body?.currentBalance === "number") {
     data.currentBalance = body.currentBalance;
+  }
+  if (body && typeof body === "object" && "institutionId" in body) {
+    if (body.institutionId === null) {
+      data.institutionId = null;
+    } else if (typeof body.institutionId === "string" && body.institutionId) {
+      const institution = await prisma.institution.findUnique({
+        where: { id: body.institutionId },
+        select: { userId: true },
+      });
+      if (!institution || institution.userId !== session.user.id) {
+        return NextResponse.json({ error: "Invalid institution" }, { status: 400 });
+      }
+      data.institutionId = body.institutionId;
+    } else {
+      return NextResponse.json({ error: "Invalid institutionId" }, { status: 400 });
+    }
   }
 
   const account = await prisma.bankAccount.update({ where: { id }, data });
