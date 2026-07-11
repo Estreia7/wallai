@@ -38,7 +38,7 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
           <h1 className="text-base font-bold text-white">
             Wall<span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">AI</span>
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-white/30">Finance</p>
+          <p className="text-[10px] uppercase tracking-widest text-white/50">Finance</p>
         </div>
       </div>
 
@@ -49,13 +49,17 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-colors ${
+              aria-current={isActive ? "page" : undefined}
+              className={`relative flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-white/10 text-white shadow-lg shadow-white/5"
-                  : "text-white/40 hover:bg-white/5 hover:text-white/70"
+                  ? "bg-emerald-400/10 text-white shadow-lg shadow-emerald-500/10"
+                  : "text-white/70 hover:bg-white/5 hover:text-white"
               }`}
             >
-              {item.icon}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-emerald-400 to-cyan-400" />
+              )}
+              <span className={isActive ? "text-emerald-300" : "text-current"}>{item.icon}</span>
               {item.label}
             </Link>
           );
@@ -65,7 +69,7 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
       <div className="border-t border-white/5 p-3">
         <button
           onClick={onLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-white/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-red-500/10 hover:text-red-400"
         >
           <LogoutIcon />
           Sign out

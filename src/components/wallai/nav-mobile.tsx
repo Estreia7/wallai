@@ -72,7 +72,7 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
         </div>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-white/60 transition-colors sm:hover:bg-white/10 sm:hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-white/90 transition-colors sm:hover:bg-white/10 sm:hover:text-white"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
         >
           {menuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -100,13 +100,17 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${
+                aria-current={isActive ? "page" : undefined}
+                className={`relative flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-white/10 text-white"
-                    : "text-white/60 sm:hover:bg-white/5 sm:hover:text-white/80"
+                    ? "bg-emerald-400/10 text-white"
+                    : "text-white/80 sm:hover:bg-white/5 sm:hover:text-white"
                 }`}
               >
-                {item.icon}
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-emerald-400 to-cyan-400" />
+                )}
+                <span className={isActive ? "text-emerald-300" : "text-current"}>{item.icon}</span>
                 {item.label}
               </Link>
             );
