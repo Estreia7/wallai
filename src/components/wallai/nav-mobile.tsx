@@ -11,6 +11,7 @@ import {
   PropertyIcon,
   AnalysisIcon,
   LearnIcon,
+  UsageIcon,
   SettingsIcon,
   LogoutIcon,
   MenuIcon,
@@ -25,16 +26,25 @@ const navItems = [
   { icon: <PropertyIcon />, label: "Property", href: "/property" },
   { icon: <AnalysisIcon />, label: "Analysis", href: "/analysis" },
   { icon: <LearnIcon />, label: "Learn", href: "/learn" },
+  { icon: <UsageIcon />, label: "AI Usage", href: "/usage" },
   { icon: <SettingsIcon />, label: "Settings", href: "/settings" },
 ];
 
 export function NavMobile({ onLogout }: { onLogout: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [todoCount, setTodoCount] = useState(0);
   const pathname = usePathname();
 
   // Close menu on route change
   useEffect(() => {
     setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    fetch("/api/wallai/todos")
+      .then((r) => r.json())
+      .then((d) => setTodoCount(d.todos?.length ?? 0))
+      .catch(() => {});
   }, [pathname]);
 
   // Close menu on resize to desktop
@@ -117,6 +127,11 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
                 )}
                 <span className={isActive ? "text-emerald-300" : "text-current"}>{item.icon}</span>
                 {item.label}
+                {item.href === "/dashboard" && todoCount > 0 && (
+                  <span className="ml-auto rounded-full bg-emerald-500 px-1.5 text-[10px] font-bold text-white">
+                    {todoCount}
+                  </span>
+                )}
               </Link>
             );
           })}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,6 +11,7 @@ import {
   PropertyIcon,
   AnalysisIcon,
   LearnIcon,
+  UsageIcon,
   SettingsIcon,
   LogoutIcon,
 } from "./nav-icons";
@@ -22,11 +24,20 @@ const navItems = [
   { icon: <PropertyIcon />, label: "Property", href: "/property" },
   { icon: <AnalysisIcon />, label: "Analysis", href: "/analysis" },
   { icon: <LearnIcon />, label: "Learn", href: "/learn" },
+  { icon: <UsageIcon />, label: "AI Usage", href: "/usage" },
   { icon: <SettingsIcon />, label: "Settings", href: "/settings" },
 ];
 
 export function NavSidebar({ onLogout }: { onLogout: () => void }) {
   const pathname = usePathname();
+  const [todoCount, setTodoCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/wallai/todos")
+      .then((r) => r.json())
+      .then((d) => setTodoCount(d.todos?.length ?? 0))
+      .catch(() => {});
+  }, [pathname]);
 
   return (
     <aside className="fixed left-0 top-0 z-20 hidden h-full w-64 flex-col border-r border-white/5 bg-white/[0.03] backdrop-blur-2xl lg:flex">
@@ -61,6 +72,11 @@ export function NavSidebar({ onLogout }: { onLogout: () => void }) {
               )}
               <span className={isActive ? "text-emerald-300" : "text-current"}>{item.icon}</span>
               {item.label}
+              {item.href === "/dashboard" && todoCount > 0 && (
+                <span className="ml-auto rounded-full bg-emerald-500 px-1.5 text-[10px] font-bold text-white">
+                  {todoCount}
+                </span>
+              )}
             </Link>
           );
         })}

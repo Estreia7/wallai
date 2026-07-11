@@ -5,6 +5,15 @@ import { fetchPrices } from "@/lib/wallai/crypto/coingecko";
 import { buildConverter } from "@/lib/wallai/fx";
 import { loadSnapshots, recordSnapshot } from "@/lib/wallai/snapshots";
 import { loadEffectiveBankAccounts } from "@/lib/wallai/balances";
+import { checkMissingBills } from "@/lib/wallai/knowledge/bills";
+import { listPendingTodos } from "@/lib/wallai/knowledge/todos";
+
+export type DashboardTodo = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+};
 
 export { isIncome } from "@/lib/wallai/categories";
 
@@ -47,6 +56,7 @@ export type DashboardData = {
   freshness: { bankLastUpdated: Date | null };
   hasAnyData: boolean;
   hasNonPrimaryCurrencyAccount: boolean;
+  todos: DashboardTodo[];
 };
 
 /* ── Helpers ───────────────────────────────────────────────────── */
@@ -314,6 +324,21 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     (a) => a.currency !== primaryCurrency
   );
 
+  /* ── Knowledge to-dos (lazy missing-bill check, idempotent) ── */
+
+  try {
+    await checkMissingBills(userId, now);
+  } catch (err) {
+    console.error("[dashboard] checkMissingBills failed", err);
+  }
+  const pendingTodos = await listPendingTodos(userId);
+  const todos: DashboardTodo[] = pendingTodos.slice(0, 6).map((t) => ({
+    id: t.id,
+    type: t.type,
+    title: t.title,
+    body: t.body,
+  }));
+
   /* ── Assemble ────────────────────────────────────── */
 
   return {
@@ -371,5 +396,6 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
     freshness: { bankLastUpdated: freshnessRow._max.date ?? null },
     hasAnyData,
     hasNonPrimaryCurrencyAccount,
+    todos,
   };
 }

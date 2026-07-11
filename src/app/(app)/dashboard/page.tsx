@@ -9,6 +9,7 @@ import { IncomeExpensesChart } from "@/components/wallai/dashboard/income-expens
 import { AllocationDonut } from "@/components/wallai/dashboard/allocation-donut";
 import { TipCard } from "@/components/wallai/dashboard/tip-card";
 import { RecentTransactions } from "@/components/wallai/dashboard/recent-transactions";
+import { TodosCard } from "@/components/wallai/dashboard/todos-card";
 import { DashboardEmptyState } from "@/components/wallai/dashboard/empty-state";
 
 function formatCurrency(value: number, currency: string): string {
@@ -117,6 +118,12 @@ export default async function Dashboard() {
       <DashboardHeader name={data.user.name} />
 
       <NetWorthHero netWorth={data.netWorth} freshness={data.freshness} />
+
+      {data.todos.length > 0 && (
+        <div className="mb-4 sm:mb-6">
+          <TodosCard initial={data.todos} />
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="mb-4 grid grid-cols-2 gap-3 sm:mb-6 sm:gap-4 xl:grid-cols-4">
