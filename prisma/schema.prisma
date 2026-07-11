@@ -35,6 +35,9 @@ model User {
   netWorthSnapshots NetWorthSnapshot[]
   userBooks         UserBook[]
   hiddenBooks       UserBookHidden[]
+  merchantRules     MerchantRule[]
+  recurringBills    RecurringBill[]
+  todos             Todo[]
 
   anthropicKeyEncrypted String?
 }
@@ -273,6 +276,67 @@ model ApiUsage {
   createdAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Financial knowledge ──────────────────────────────
+
+model MerchantRule {
+  id          String    @id @default(cuid())
+  userId      String
+  merchantKey String
+  displayName String
+  category    String
+  source      String // "user_correction" | "confirmed" | "ai_guess"
+  hitCount    Int       @default(0)
+  lastSeenAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, merchantKey])
+  @@index([userId])
+}
+
+model RecurringBill {
+  id             String    @id @default(cuid())
+  userId         String
+  name           String
+  category       String    @default("Bills & Utilities")
+  billType       String? // "energy" | "water" | "gas" | "internet" | "rent" | "subscription" | "other"
+  merchantKey    String?
+  matchKeywords  String[]
+  cadence        String    @default("monthly")
+  expectedAmount Float?
+  currency       String    @default("EUR")
+  dayOfMonthHint Int?
+  status         String // "candidate" | "active" | "dismissed"
+  source         String // "auto_detected" | "user_added"
+  lastSeenAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
+model Todo {
+  id         String    @id @default(cuid())
+  userId     String
+  type       String // "confirm_merchants" | "confirm_bill" | "add_bill_hint" | "missing_bill"
+  status     String    @default("pending")
+  title      String
+  body       String?
+  payload    Json
+  dedupeKey  String
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, status])
 }
 
 // ── Education ────────────────────────────────────────
