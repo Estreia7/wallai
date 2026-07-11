@@ -46,10 +46,10 @@ function DashboardHeader({ name }: { name: string | null }) {
   return (
     <div className="mb-6 flex items-start justify-between gap-3 sm:mb-8 sm:items-center">
       <div className="min-w-0 flex-1">
-        <h2 className="truncate text-xl font-bold text-white sm:text-2xl">
+        <h2 className="section-title truncate">
           Good morning, {displayName}
         </h2>
-        <p className="mt-0.5 text-xs text-white/40 sm:mt-1 sm:text-sm">
+        <p className="lead mt-1 text-xs sm:text-sm">
           Here&apos;s your financial overview
         </p>
       </div>

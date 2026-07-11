@@ -1,34 +1,41 @@
-# UDM Design System
+# WallAI Design System
 
-Base rules and guidelines for every page and component of the UD Messinense
-website. Distilled from [designmotionhq.com](https://designmotionhq.com/)
-pattern breakdowns, applied to our brand. **When in doubt, follow this file.**
+Base rules and guidelines for every page and component of the WallAI app.
+Distilled from [designmotionhq.com](https://designmotionhq.com/) pattern
+breakdowns (originally written for UD Messinense), with **WallAI's own palette**
+swapped in — everything except §1 is adopted as-is. **When in doubt, follow
+this file.**
 
 ---
 
-## 1. Colors (our palette — do not change)
+## 1. Colors (WallAI palette — do not change)
 
-Green is the structure, gold is the accent. Gold is *limited currency*: it is
-reserved for the ONE action we want the user to take on each screen.
+WallAI is a dark glass app. The near-black base is the structure; emerald is the
+accent, with cyan as its gradient partner. The accent is *limited currency*:
+reserved for the ONE action or the "you are here" marker on each screen.
 
-| Token             | Value     | Role                                            |
-| ----------------- | --------- | ----------------------------------------------- |
-| `green-primary`   | `#1B7A3D` | Brand green — links, primary buttons            |
-| `green-deep`      | `#0E5228` | Dark surfaces (hero, footer), headings          |
-| `green-leaf`      | `#2E9E4F` | Hover/active states of green                    |
-| `gold`            | `#F4C20D` | THE accent. One primary CTA per screen, badges  |
-| `ink`             | `#111111` | Body text                                       |
-| `grey-50`         | `#F5F5F5` | Subtle backgrounds                              |
-| `grey-500`        | `#6B6B6B` | Secondary text (only on light bg — see §8)      |
+| Token           | Value               | Role                                            |
+| --------------- | ------------------- | ----------------------------------------------- |
+| `surface-base`  | `#0A0E1A`           | App background (dark)                            |
+| `accent`        | `#34D399` (emerald-400) | THE accent — primary action, active nav, links |
+| `accent-2`      | `#22D3EE` (cyan-400)    | Gradient partner (accent→accent-2 marks brand)  |
+| `text`          | `#FFFFFF`           | Primary text on dark                             |
+| `text-muted`    | `white / 70%`       | Secondary text (§2/§8) — never below ~55%        |
+| `surface-card`  | `white / 5%`        | Glass card fill over the base                    |
+| `hairline`      | `white / 8–10%`     | Card & divider borders                           |
 
 Rules:
-- **One accent per screen.** Gold marks the single most important action
-  ("Associa-te", "Ver jogos"). Never use gold for two competing CTAs in the
-  same viewport.
+- **One accent per screen.** The emerald→cyan gradient marks the single most
+  important action or the active state. Never use it for two competing CTAs in
+  the same viewport.
 - Don't color every element differently — hierarchy comes from size, weight,
-  contrast and spacing (§2), not from rainbow color.
-- Name by meaning, not value: use semantic tokens (`--surface`, `--accent`)
-  that reference these primitives; never hardcode hex in components.
+  contrast and spacing (§2), not from rainbow color. (Stat cards may use tinted
+  category washes — cash/emerald, crypto/cyan, property/violet, debt/amber — as
+  quiet backgrounds, not competing accents.)
+- Name by meaning, not value: use semantic tokens (`--accent`, `--surface-base`,
+  `--shadow-card`) from `globals.css`; never hardcode hex in components.
+- On dark surfaces, muted text is `white/70` (never a grey token below readable
+  contrast). This is the rule the old `white/40` copy was breaking.
 
 ## 2. Visual hierarchy — five signals, always stacked
 
@@ -81,8 +88,9 @@ Stack layered shadows — never a single flat drop shadow.
 
 - `--shadow-card` (resting): contact `0 1px 3px` + soft ambient spread.
 - `--shadow-lift` (hover/raised): deeper contact + wide soft spread.
-- Shadows are **tinted with green-deep**, not pure black — a subtle branded
-  glow reads premium.
+- Shadows are **tinted with the dark base** (`rgba(2,8,20,…)`); the raised
+  state adds a subtle emerald glow, not pure black — a branded glow reads
+  premium.
 - Elevation encodes importance: reserve the strongest shadow for the most
   important element (live-match panel, primary modal). Most surfaces stay
   low.
@@ -189,20 +197,23 @@ on the same grid.
 
 ## 14. Navigation
 
-- Primary navigation stays visible: horizontal bar on desktop (sticky,
-  translucent white + blur), the mobile menu holds the same full list —
-  never hide desktop nav behind a hamburger.
-- Active page is marked (green text + gold underline indicator).
-- 3–5 core destinations first (Notícias, Equipas, Jogos, Classificação);
-  institutional links follow.
+- Primary navigation stays visible: a fixed sidebar on desktop (`lg:`), a
+  top bar + slide-down menu on mobile holding the same full list — the mobile
+  menu never drops a destination the sidebar shows.
+- Active page is marked: emerald→cyan indicator bar + emerald icon + tinted
+  background, and `aria-current="page"`. Inactive items stay at `white/70`
+  (readable), never `white/40`.
+- Core destinations first (Dashboard, Bank, Crypto, Debts, Property, Analysis,
+  Learn), Settings last.
 
 ---
 
 ### Implementation map
 
-- Primitives + semantic tokens: `src/app/globals.css` (`:root`) and
-  `tailwind.config.ts` (mirrored — keep in sync).
-- Component recipes (`.card`, `.btn-*`, `.section-title`, `.badge-live`,
-  `.reveal`): `src/app/globals.css` `@layer components`.
-- Shared UI: `src/components/` — every new component must use the recipes
-  above instead of ad-hoc classes.
+- WallAI is **Tailwind v4** — there is no `tailwind.config.ts`. Primitives +
+  semantic tokens live in `src/app/globals.css` (`:root` and `@theme`).
+- Component recipes (`.card`, `.card-hover`, `.section-title`, `.kicker`,
+  `.lead`, `.container-page`): `src/app/globals.css` `@layer components`.
+  Global `:focus-visible` ring and `prefers-reduced-motion` live there too.
+- Shared UI: `src/components/wallai/` — prefer `GlassCard` (built on `.card`)
+  and the recipes above instead of ad-hoc `rounded/border/shadow` classes.

@@ -24,3 +24,103 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+/* ------------------------------------------------------------------ */
+/* WallAI design system — adapted from docs/DESIGN.md.                 */
+/* Colors stay WallAI (emerald/cyan on #0A0E1A); the hierarchy,        */
+/* radius, elevation, motion and focus rules come from the doc.        */
+/* ------------------------------------------------------------------ */
+:root {
+  /* Palette (semantic — the one thing kept from WallAI, not the doc) */
+  --surface-base: #0a0e1a;
+  --accent: #34d399; /* emerald-400 */
+  --accent-2: #22d3ee; /* cyan-400 */
+
+  /* §4 Radius — one scale, nested corners = outer − padding */
+  --radius-chip: 4px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --radius-feature: 24px;
+
+  /* §5 Elevation — two stacked shadows, tinted with the dark base;    */
+  /* the raised state adds a subtle emerald glow instead of pure black */
+  --shadow-card: 0 1px 3px rgba(2, 8, 20, 0.55), 0 10px 28px -12px rgba(2, 8, 20, 0.6);
+  --shadow-lift: 0 2px 6px rgba(2, 8, 20, 0.65), 0 20px 44px -14px rgba(16, 185, 129, 0.28);
+
+  /* §6 Motion — respond under 400ms; never linear for start/stop UI */
+  --dur-tap: 90ms;
+  --dur-hover: 200ms;
+  --dur-enter: 260ms;
+  --dur-exit: 150ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* §9 Focus & keyboard — never remove focus without a replacement.     */
+/* Emerald ring (gold's role on dark, kept in WallAI's palette).       */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* §6 Motion — everything respects reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  /* §3 Page container — max-w-6xl, centered */
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  /* §7 Card — hairline border + two stacked shadows. Backdrop blur is  */
+  /* left to the component so mobile can stay light (perf).             */
+  .card {
+    border-radius: var(--radius-card);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    background: rgb(255 255 255 / 0.05);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* §7 Card hover — lift + deepen shadow together, never scale the card */
+  .card-hover {
+    transition:
+      transform var(--dur-hover) var(--ease-out),
+      box-shadow var(--dur-hover) var(--ease-out);
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* §2 Type — kicker / section title / lead */
+  .kicker {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+  }
+  .section-title {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 1.875rem);
+  }
+  /* Secondary text sits at 70% opacity — subordinated, still readable  */
+  /* (§2/§8). Replaces the white/40 that made copy near-invisible.      */
+  .lead {
+    color: rgb(255 255 255 / 0.7);
+  }
+}
