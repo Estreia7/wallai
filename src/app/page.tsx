@@ -96,7 +96,7 @@ export default function WallAILogin() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-white/30">
+        <p className="mt-6 text-center text-xs text-white/50">
           A playground experiment by Bruno Estreia
         </p>
       </div>

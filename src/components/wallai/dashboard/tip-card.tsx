@@ -9,7 +9,7 @@ export function TipCard({ tip }: TipCardProps) {
   if (!tip) {
     return (
       <GlassCard className="flex items-center justify-center">
-        <p className="text-xs text-white/40 sm:text-sm">No tip today</p>
+        <p className="text-xs text-white/70 sm:text-sm">No tip today</p>
       </GlassCard>
     );
   }

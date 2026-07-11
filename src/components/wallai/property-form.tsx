@@ -120,7 +120,7 @@ export function PropertyForm({
             placeholder="0.00"
             className={inputClass}
           />
-          <p className="mt-1 text-[10px] text-white/40">
+          <p className="mt-1 text-[10px] text-white/70">
             You can record more valuations over time from the property card.
           </p>
         </div>

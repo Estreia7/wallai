@@ -44,7 +44,7 @@ export function CurrencyCard({ initialCurrency }: CurrencyCardProps) {
     <GlassCard>
       <div className="mb-3">
         <h3 className="text-sm font-semibold text-white">Display Currency</h3>
-        <p className="mt-1 text-xs text-white/40">
+        <p className="mt-1 text-xs text-white/70">
           All values across the app will be shown in this currency.
         </p>
       </div>

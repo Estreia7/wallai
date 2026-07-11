@@ -25,7 +25,7 @@ export function BookCard({ book }: { book: Book }) {
             unoptimized
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs text-white/30">
+          <div className="flex h-full items-center justify-center text-xs text-white/50">
             No cover
           </div>
         )}
@@ -36,7 +36,7 @@ export function BookCard({ book }: { book: Book }) {
           <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] uppercase tracking-wider text-white/50">
             {book.category}
           </span>
-          {book.year && <span className="text-[10px] text-white/30">{book.year}</span>}
+          {book.year && <span className="text-[10px] text-white/50">{book.year}</span>}
         </div>
         <h3 className="text-sm font-semibold text-white sm:text-base">{book.title}</h3>
         <p className="text-[11px] text-white/50">by {book.author}</p>

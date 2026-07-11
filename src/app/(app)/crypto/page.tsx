@@ -47,7 +47,7 @@ export default async function CryptoPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-white sm:text-2xl">Crypto</h2>
+        <h2 className="section-title">Crypto</h2>
         {holdings.length > 0 && <CryptoAddHoldingButton />}
       </div>
 

@@ -104,7 +104,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
             placeholder="Search by title or author..."
             className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-white/30"
           />
-          {searching && <p className="text-xs text-white/40">Searching…</p>}
+          {searching && <p className="text-xs text-white/70">Searching…</p>}
           <ul className="max-h-80 space-y-1 overflow-y-auto">
             {results.map((r) => (
               <li key={r.externalId}>
@@ -129,7 +129,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
               </li>
             ))}
             {query.length >= 2 && !searching && results.length === 0 && (
-              <li className="text-xs text-white/40">No matches — try a different title or author</li>
+              <li className="text-xs text-white/70">No matches — try a different title or author</li>
             )}
           </ul>
         </div>
@@ -147,7 +147,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
               <p className="truncate text-xs text-white/50">{selected.authors.join(", ")}</p>
               <button
                 type="button"
-                className="mt-1 text-[10px] text-white/40 underline"
+                className="mt-1 text-[10px] text-white/70 underline"
                 onClick={() => setSelected(null)}
               >
                 Change
@@ -156,7 +156,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-wider text-white/40">Status</label>
+            <label className="text-[10px] uppercase tracking-wider text-white/70">Status</label>
             <div className="flex gap-2">
               {STATUS_OPTIONS.map((opt) => (
                 <button
@@ -177,7 +177,7 @@ export function AddBookModal({ open, onClose, onAdded }: Props) {
 
           {status === "read" && (
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-wider text-white/40">Rating (optional)</label>
+              <label className="text-[10px] uppercase tracking-wider text-white/70">Rating (optional)</label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button

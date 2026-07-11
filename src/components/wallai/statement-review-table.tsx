@@ -235,7 +235,7 @@ export function StatementReviewTable({
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <svg
-                    className={`h-3 w-3 shrink-0 text-white/40 transition-transform ${
+                    className={`h-3 w-3 shrink-0 text-white/70 transition-transform ${
                       expanded ? "rotate-90" : ""
                     }`}
                     fill="none"
@@ -254,19 +254,19 @@ export function StatementReviewTable({
                 </div>
                 <div className="flex shrink-0 items-center gap-2 text-right text-[10px] sm:gap-3 sm:text-xs">
                   <div className="hidden sm:block">
-                    <p className="text-[10px] uppercase tracking-wider text-white/30">In</p>
+                    <p className="text-[10px] uppercase tracking-wider text-white/50">In</p>
                     <p className="font-semibold text-emerald-400">
                       {fmt(group.income, primaryCurrency)}
                     </p>
                   </div>
                   <div className="hidden sm:block">
-                    <p className="text-[10px] uppercase tracking-wider text-white/30">Out</p>
+                    <p className="text-[10px] uppercase tracking-wider text-white/50">Out</p>
                     <p className="font-semibold text-red-400">
                       {fmt(group.expenses, primaryCurrency)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[9px] uppercase tracking-wider text-white/30 sm:text-[10px]">
+                    <p className="text-[9px] uppercase tracking-wider text-white/50 sm:text-[10px]">
                       Net
                     </p>
                     <p
@@ -300,7 +300,7 @@ export function StatementReviewTable({
                             type="date"
                             value={row.date}
                             onChange={(e) => updateRow(i, { date: e.target.value })}
-                            className="mt-0.5 rounded-md border border-transparent bg-transparent px-1 py-0.5 text-[10px] text-white/40 outline-none focus:border-white/20 focus:bg-white/5 sm:text-xs"
+                            className="mt-0.5 rounded-md border border-transparent bg-transparent px-1 py-0.5 text-[10px] text-white/70 outline-none focus:border-white/20 focus:bg-white/5 sm:text-xs"
                           />
                         </div>
                         <div className="flex shrink-0 items-center gap-1.5">
@@ -319,7 +319,7 @@ export function StatementReviewTable({
                           <button
                             type="button"
                             onClick={() => removeRow(i)}
-                            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-7 sm:w-7 sm:text-white/30 sm:hover:bg-red-500/10 sm:hover:text-red-400"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 sm:h-7 sm:w-7 sm:text-white/50 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                             aria-label="Remove"
                           >
                             <svg

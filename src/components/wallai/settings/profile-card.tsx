@@ -84,13 +84,13 @@ export function ProfileCard({ initialName, email }: ProfileCardProps) {
 
       {/* Email (read-only) */}
       <div className="mb-4">
-        <label className="mb-1 block text-xs text-white/40">Email</label>
+        <label className="mb-1 block text-xs text-white/70">Email</label>
         <p className="text-sm text-white/60">{email}</p>
       </div>
 
       {/* Name */}
       <form onSubmit={handleNameSave} className="mb-6">
-        <label className="mb-1 block text-xs text-white/40">Name</label>
+        <label className="mb-1 block text-xs text-white/70">Name</label>
         <div className="flex gap-2">
           <input
             type="text"

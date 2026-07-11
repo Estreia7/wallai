@@ -52,7 +52,7 @@ export function InsightCard({ period }: { period: number }) {
             AI insight
           </span>
           {state.kind === "ready" && state.cached && (
-            <span className="text-[10px] text-white/30">cached</span>
+            <span className="text-[10px] text-white/50">cached</span>
           )}
         </div>
         <button

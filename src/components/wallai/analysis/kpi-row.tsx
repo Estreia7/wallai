@@ -28,11 +28,11 @@ function StatCard({ stat }: { stat: Stat }) {
             : "text-white";
   return (
     <GlassCard>
-      <div className="text-[10px] uppercase tracking-wider text-white/40">{stat.label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-white/70">{stat.label}</div>
       <div className={`mt-1 text-xl font-bold tabular-nums sm:text-2xl ${accentClass}`}>
         {stat.value}
       </div>
-      {stat.sub && <div className="mt-0.5 text-[10px] text-white/40">{stat.sub}</div>}
+      {stat.sub && <div className="mt-0.5 text-[10px] text-white/70">{stat.sub}</div>}
     </GlassCard>
   );
 }

@@ -34,7 +34,7 @@ export function TipCard({ tip }: { tip: Tip }) {
         {isQuote && <span className="text-cyan-400/60">&rdquo;</span>}
       </p>
       {tip.author && (
-        <p className="mt-2 text-[11px] text-white/40">— {tip.author}</p>
+        <p className="mt-2 text-[11px] text-white/70">— {tip.author}</p>
       )}
     </GlassCard>
   );

@@ -40,8 +40,8 @@ export default async function AnalysisPage({
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white sm:text-2xl">Analysis</h2>
-          <p className="mt-0.5 text-xs text-white/40 sm:text-sm">
+          <h2 className="section-title">Analysis</h2>
+          <p className="mt-0.5 text-xs text-white/70 sm:text-sm">
             Spending and income insights
           </p>
         </div>
@@ -52,7 +52,7 @@ export default async function AnalysisPage({
         <GlassCard>
           <div className="py-10 text-center">
             <p className="text-sm text-white/60">No transactions in the last {period} months.</p>
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-white/70">
               Import a bank statement to see spending analysis.
             </p>
           </div>

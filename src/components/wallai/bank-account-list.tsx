@@ -186,9 +186,9 @@ export function BankAccountList({
         </div>
 
         {loading ? (
-          <p className="text-xs text-white/40">Loading...</p>
+          <p className="text-xs text-white/70">Loading...</p>
         ) : accounts.length === 0 && institutions.length === 0 ? (
-          <p className="text-xs text-white/40">No accounts yet. Add one to start tracking.</p>
+          <p className="text-xs text-white/70">No accounts yet. Add one to start tracking.</p>
         ) : (
           <div className="space-y-3">
             {groups.map((group) => (
@@ -214,7 +214,7 @@ export function BankAccountList({
           <button
             type="button"
             onClick={() => setManageOpen(true)}
-            className="text-[11px] text-white/40 underline-offset-2 hover:text-white/70 hover:underline"
+            className="text-[11px] text-white/70 underline-offset-2 hover:text-white/70 hover:underline"
           >
             Manage institutions
           </button>
@@ -326,7 +326,7 @@ function GroupBlock({
             className="flex-1 text-left"
           >
             <p className="text-sm font-semibold text-white/90">{institution.name}</p>
-            <p className="text-[10px] text-white/40">
+            <p className="text-[10px] text-white/70">
               {accounts.length === 0
                 ? "No accounts"
                 : total
@@ -340,7 +340,7 @@ function GroupBlock({
       {(!institution || expanded) && (
         <div className={institution ? "space-y-1.5 pl-3" : "space-y-1.5"}>
           {accounts.length === 0 && institution ? (
-            <p className="pl-2 text-[10px] text-white/30">No accounts under this institution.</p>
+            <p className="pl-2 text-[10px] text-white/50">No accounts under this institution.</p>
           ) : (
             accounts.map((account) => {
               const isSelected =
@@ -364,7 +364,7 @@ function GroupBlock({
                         {bankAccountTypeLabel(account.type)}
                       </span>
                     </div>
-                    <p className="text-[10px] text-white/40">
+                    <p className="text-[10px] text-white/70">
                       {formatCurrency(account.currentBalance, account.currency)}
                     </p>
                   </button>
@@ -374,7 +374,7 @@ function GroupBlock({
                         e.stopPropagation();
                         onEditAccount(account);
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-8 sm:w-8 sm:hover:bg-white/10 sm:hover:text-white"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 sm:h-8 sm:w-8 sm:hover:bg-white/10 sm:hover:text-white"
                       aria-label="Edit"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -386,7 +386,7 @@ function GroupBlock({
                         e.stopPropagation();
                         onDeleteAccount(account);
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/40 sm:h-8 sm:w-8 sm:hover:bg-red-500/10 sm:hover:text-red-400"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white/70 sm:h-8 sm:w-8 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                       aria-label="Delete"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -523,7 +523,7 @@ function ManageInstitutions({
       {error && <p className="text-xs text-red-400">{error}</p>}
 
       {institutions.length === 0 ? (
-        <p className="text-xs text-white/40">No institutions yet.</p>
+        <p className="text-xs text-white/70">No institutions yet.</p>
       ) : (
         <div className="space-y-2">
           {institutions.map((inst) => {
@@ -567,7 +567,7 @@ function ManageInstitutions({
                   <>
                     <div className="flex-1 min-w-0">
                       <p className="truncate text-sm text-white/90">{inst.name}</p>
-                      <p className="text-[10px] text-white/40">
+                      <p className="text-[10px] text-white/70">
                         {count} account{count === 1 ? "" : "s"}
                       </p>
                     </div>

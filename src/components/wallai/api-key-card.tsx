@@ -58,14 +58,14 @@ export function ApiKeyCard() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold text-white">Anthropic API Key</h3>
-          <p className="mt-1 text-xs text-white/40">
+          <p className="mt-1 text-xs text-white/70">
             Required for parsing bank statements and AI analysis. Get one at console.anthropic.com.
           </p>
         </div>
         {configured !== null && (
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs ${
-              configured ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/40"
+              configured ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-white/70"
             }`}
           >
             {configured ? "Configured" : "Not set"}

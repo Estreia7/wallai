@@ -32,7 +32,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <GradientBg />
         <div className="relative z-10 flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-emerald-400" />
-          <p className="text-sm text-white/40">Loading...</p>
+          <p className="text-sm text-white/70">Loading...</p>
         </div>
       </div>
     );

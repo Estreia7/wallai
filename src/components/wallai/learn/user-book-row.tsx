@@ -111,7 +111,7 @@ export function UserBookRow({ userBook, onChanged }: Props) {
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
-          className="rounded-lg p-1.5 text-white/40 hover:bg-white/5"
+          className="rounded-lg p-1.5 text-white/70 hover:bg-white/5"
           aria-label="Book options"
         >
           ⋯

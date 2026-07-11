@@ -21,7 +21,7 @@ export default function BankPage() {
 
   return (
     <div>
-      <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">Bank Statements</h2>
+      <h2 className="mb-6 section-title">Bank Statements</h2>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="space-y-4">

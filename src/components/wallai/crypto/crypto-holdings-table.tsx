@@ -101,7 +101,7 @@ export function CryptoHoldingsTable({
                 ? "text-emerald-400"
                 : h.pnlEur < 0
                   ? "text-red-400"
-                  : "text-white/40";
+                  : "text-white/70";
             return (
               <div
                 key={h.id}
@@ -110,7 +110,7 @@ export function CryptoHoldingsTable({
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="font-semibold text-white">{h.symbol}</div>
-                    <div className="truncate text-[10px] text-white/40">{h.name}</div>
+                    <div className="truncate text-[10px] text-white/70">{h.name}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-semibold text-white tabular-nums">
@@ -124,15 +124,15 @@ export function CryptoHoldingsTable({
                 </div>
                 <div className="grid grid-cols-3 gap-2 border-t border-white/5 pt-2 text-[11px]">
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-white/30">Qty</div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/50">Qty</div>
                     <div className="text-white/80 tabular-nums">{formatQty(h.quantity)}</div>
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-white/30">Avg cost</div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/50">Avg cost</div>
                     <div className="text-white/80 tabular-nums">{formatCurrency(h.avgCostEur)}</div>
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase tracking-wider text-white/30">Price</div>
+                    <div className="text-[9px] uppercase tracking-wider text-white/50">Price</div>
                     <div className="text-white/80 tabular-nums">
                       {h.priceEur !== null ? formatCurrency(h.priceEur) : <span className="text-amber-400">—</span>}
                     </div>
@@ -161,7 +161,7 @@ export function CryptoHoldingsTable({
         <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-xs sm:text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-left text-white/40">
+              <tr className="border-b border-white/10 text-left text-white/70">
                 <th className="pb-2 font-medium">Coin</th>
                 <th className="pb-2 font-medium">Qty</th>
                 <th className="pb-2 font-medium">Avg cost</th>
@@ -178,12 +178,12 @@ export function CryptoHoldingsTable({
                     ? "text-emerald-400"
                     : h.pnlEur < 0
                       ? "text-red-400"
-                      : "text-white/40";
+                      : "text-white/70";
                 return (
                   <tr key={h.id} className="border-b border-white/5 last:border-0">
                     <td className="py-2.5">
                       <div className="font-semibold text-white">{h.symbol}</div>
-                      <div className="text-[10px] text-white/40 sm:text-xs">{h.name}</div>
+                      <div className="text-[10px] text-white/70 sm:text-xs">{h.name}</div>
                     </td>
                     <td className="py-2.5 text-white/80">{formatQty(h.quantity)}</td>
                     <td className="py-2.5 text-white/80">{formatCurrency(h.avgCostEur)}</td>

@@ -25,7 +25,7 @@ export function StatCard({
         className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradient} pointer-events-none`}
       />
       <div className="relative">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+        <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
           {label}
         </p>
         <p className="mt-1 text-lg font-bold text-white sm:mt-2 sm:text-2xl">

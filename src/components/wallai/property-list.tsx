@@ -94,18 +94,18 @@ function PropertyCard({
             {property.name}
           </h3>
           {property.debt ? (
-            <p className="mt-0.5 text-[10px] text-white/40 sm:text-xs">
+            <p className="mt-0.5 text-[10px] text-white/70 sm:text-xs">
               Linked: {property.debt.name} ({formatCurrency(property.debt.currentBalance, property.debt.currency)} owed)
             </p>
           ) : (
-            <p className="mt-0.5 text-[10px] text-white/40 sm:text-xs">No linked mortgage</p>
+            <p className="mt-0.5 text-[10px] text-white/70 sm:text-xs">No linked mortgage</p>
           )}
         </div>
         <div className="shrink-0 text-right">
           <div className="text-base font-bold text-white tabular-nums sm:text-lg">
             {latest ? formatCurrency(marketValue, property.currency) : "—"}
           </div>
-          <div className="text-[10px] text-white/40">
+          <div className="text-[10px] text-white/70">
             {latest ? `as of ${formatDate(latest.date)}` : "no valuation"}
           </div>
         </div>
@@ -115,19 +115,19 @@ function PropertyCard({
       {latest && (
         <div className="grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-xs">
           <div>
-            <div className="text-[9px] uppercase tracking-wider text-white/30">Value</div>
+            <div className="text-[9px] uppercase tracking-wider text-white/50">Value</div>
             <div className="font-semibold text-white/90 tabular-nums">
               {formatCurrency(marketValue, property.currency)}
             </div>
           </div>
           <div>
-            <div className="text-[9px] uppercase tracking-wider text-white/30">Debt</div>
+            <div className="text-[9px] uppercase tracking-wider text-white/50">Debt</div>
             <div className="font-semibold text-amber-400 tabular-nums">
               {formatCurrency(debtBalance, property.currency)}
             </div>
           </div>
           <div>
-            <div className="text-[9px] uppercase tracking-wider text-white/30">Equity</div>
+            <div className="text-[9px] uppercase tracking-wider text-white/50">Equity</div>
             <div
               className={`font-semibold tabular-nums ${
                 equity >= 0 ? "text-emerald-400" : "text-red-400"
@@ -135,7 +135,7 @@ function PropertyCard({
             >
               {formatCurrency(equity, property.currency)}
               {marketValue > 0 && (
-                <span className="ml-1 text-[9px] text-white/40">
+                <span className="ml-1 text-[9px] text-white/70">
                   ({equityPct.toFixed(0)}%)
                 </span>
               )}
@@ -265,7 +265,7 @@ export function PropertyList() {
   return (
     <>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-bold text-white sm:text-2xl">Property</h2>
+        <h2 className="section-title">Property</h2>
         <button
           onClick={() => {
             setEditing(null);
@@ -279,13 +279,13 @@ export function PropertyList() {
 
       {loading ? (
         <GlassCard>
-          <p className="text-xs text-white/40">Loading...</p>
+          <p className="text-xs text-white/70">Loading...</p>
         </GlassCard>
       ) : properties.length === 0 ? (
         <GlassCard>
           <div className="py-6 text-center">
             <p className="text-sm text-white/60">No properties tracked yet.</p>
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-white/70">
               Add a home, apartment, or land to track market value and equity.
             </p>
           </div>
@@ -300,19 +300,19 @@ export function PropertyList() {
             )}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-white/40">Total value</div>
+                <div className="text-[10px] uppercase tracking-wider text-white/70">Total value</div>
                 <div className="mt-1 text-xl font-bold text-white tabular-nums sm:text-2xl">
                   {formatCurrency(totalValue, primaryCurrency)}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-white/40">Mortgage debt</div>
+                <div className="text-[10px] uppercase tracking-wider text-white/70">Mortgage debt</div>
                 <div className="mt-1 text-xl font-bold text-amber-400 tabular-nums sm:text-2xl">
                   {formatCurrency(totalDebt, primaryCurrency)}
                 </div>
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <div className="text-[10px] uppercase tracking-wider text-white/40">Total equity</div>
+                <div className="text-[10px] uppercase tracking-wider text-white/70">Total equity</div>
                 <div
                   className={`mt-1 text-xl font-bold tabular-nums sm:text-2xl ${
                     totalEquity >= 0 ? "text-emerald-400" : "text-red-400"

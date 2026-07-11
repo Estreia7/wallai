@@ -123,7 +123,7 @@ export function CryptoChart({ snapshots }: { snapshots: SnapshotPoint[] }) {
         </ResponsiveContainer>
       ) : (
         <div className="flex h-[220px] items-center justify-center">
-          <p className="text-center text-xs text-white/40 sm:text-sm">
+          <p className="text-center text-xs text-white/70 sm:text-sm">
             Not enough history yet — the nightly job fills this in over time.
           </p>
         </div>

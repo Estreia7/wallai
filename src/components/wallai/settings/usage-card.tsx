@@ -88,7 +88,7 @@ export function UsageCard() {
     return (
       <GlassCard>
         <h3 className="mb-4 text-sm font-semibold text-white">API Usage</h3>
-        <p className="text-xs text-white/40">Loading...</p>
+        <p className="text-xs text-white/70">Loading...</p>
       </GlassCard>
     );
   }
@@ -97,7 +97,7 @@ export function UsageCard() {
     return (
       <GlassCard>
         <h3 className="mb-4 text-sm font-semibold text-white">API Usage</h3>
-        <p className="text-xs text-white/40">Failed to load usage data.</p>
+        <p className="text-xs text-white/70">Failed to load usage data.</p>
       </GlassCard>
     );
   }
@@ -114,7 +114,7 @@ export function UsageCard() {
         <GlassCard className="relative overflow-hidden">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 pointer-events-none" />
           <div className="relative">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
               Cost this month
             </p>
             <p className="mt-1 text-lg font-bold text-white sm:mt-2 sm:text-2xl">
@@ -125,7 +125,7 @@ export function UsageCard() {
         <GlassCard className="relative overflow-hidden">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 pointer-events-none" />
           <div className="relative">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
               API calls this month
             </p>
             <p className="mt-1 text-lg font-bold text-white sm:mt-2 sm:text-2xl">
@@ -176,12 +176,12 @@ export function UsageCard() {
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-white">{formatDay(day.date)}</span>
-                    <span className="text-xs text-white/40">{day.calls} call{day.calls !== 1 ? "s" : ""}</span>
+                    <span className="text-xs text-white/70">{day.calls} call{day.calls !== 1 ? "s" : ""}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-emerald-400">{formatCost(day.cost)}</span>
                     <svg
-                      className={`h-4 w-4 text-white/30 transition-transform ${expandedDay === day.date ? "rotate-180" : ""}`}
+                      className={`h-4 w-4 text-white/50 transition-transform ${expandedDay === day.date ? "rotate-180" : ""}`}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -196,7 +196,7 @@ export function UsageCard() {
                   <div className="mb-2 ml-3 border-l border-white/10 pl-3">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="text-white/30">
+                        <tr className="text-white/50">
                           <th className="pb-1 text-left font-medium">Time</th>
                           <th className="pb-1 text-left font-medium">Endpoint</th>
                           <th className="pb-1 text-left font-medium">Model</th>

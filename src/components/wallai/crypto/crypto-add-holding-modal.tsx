@@ -121,7 +121,7 @@ export function CryptoAddHoldingButton() {
         {step === "pick" ? (
           <div className="space-y-4">
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
                 Popular
               </p>
               <div className="flex flex-wrap gap-2">
@@ -139,7 +139,7 @@ export function CryptoAddHoldingButton() {
             </div>
 
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
                 Search any coin
               </p>
               <input
@@ -150,10 +150,10 @@ export function CryptoAddHoldingButton() {
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30"
               />
               {searching && (
-                <p className="mt-2 text-xs text-white/40">Searching…</p>
+                <p className="mt-2 text-xs text-white/70">Searching…</p>
               )}
               {!searching && query.trim().length >= 2 && results.length === 0 && (
-                <p className="mt-2 text-xs text-white/40">No matches</p>
+                <p className="mt-2 text-xs text-white/70">No matches</p>
               )}
               {results.length > 0 && (
                 <ul className="mt-2 max-h-60 overflow-y-auto rounded-lg border border-white/10">

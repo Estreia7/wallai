@@ -80,8 +80,8 @@ export function LearnClient({ initial }: { initial: Payload }) {
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white sm:text-2xl">Learn</h2>
-          <p className="mt-0.5 text-xs text-white/40 sm:text-sm">
+          <h2 className="section-title">Learn</h2>
+          <p className="mt-0.5 text-xs text-white/70 sm:text-sm">
             Track what you&apos;ve read and get 5 picks tailored to what you haven&apos;t
           </p>
         </div>
@@ -107,7 +107,7 @@ export function LearnClient({ initial }: { initial: Payload }) {
             {STATUS_ORDER.map((s) =>
               grouped[s].length === 0 ? null : (
                 <div key={s}>
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/70">
                     {STATUS_HEADING[s]}
                   </h4>
                   <div className="space-y-2">
@@ -158,7 +158,7 @@ export function LearnClient({ initial }: { initial: Payload }) {
 
       <AddBookModal open={modalOpen} onClose={() => setModalOpen(false)} onAdded={reload} />
       {loading && (
-        <p className="text-center text-[10px] text-white/30">updating…</p>
+        <p className="text-center text-[10px] text-white/50">updating…</p>
       )}
     </div>
   );

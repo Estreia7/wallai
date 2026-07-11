@@ -99,7 +99,7 @@ export function NetWorthChart({ data, currency }: NetWorthChartProps) {
         </ResponsiveContainer>
       ) : (
         <div className="flex h-[220px] items-center justify-center">
-          <p className="text-center text-xs text-white/40 sm:text-sm">
+          <p className="text-center text-xs text-white/70 sm:text-sm">
             Upload more statements to see your trend
           </p>
         </div>

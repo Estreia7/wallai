@@ -35,7 +35,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
         </Link>
       </div>
       {transactions.length === 0 ? (
-        <p className="py-4 text-center text-xs text-white/40 sm:text-sm">
+        <p className="py-4 text-center text-xs text-white/70 sm:text-sm">
           No transactions yet
         </p>
       ) : (
@@ -68,7 +68,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                     <p className="truncate text-xs font-medium text-white/90 sm:text-sm">
                       {tx.description}
                     </p>
-                    <p className="truncate text-[10px] text-white/30 sm:text-xs">
+                    <p className="truncate text-[10px] text-white/50 sm:text-xs">
                       {tx.category ?? "Uncategorized"}
                     </p>
                   </div>
@@ -82,7 +82,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                     {positiveIncome ? "+" : ""}
                     {fmt.format(tx.amount)}
                   </p>
-                  <p className="text-[10px] text-white/30 sm:text-xs">
+                  <p className="text-[10px] text-white/50 sm:text-xs">
                     {formatRelativeDate(tx.date)}
                   </p>
                 </div>

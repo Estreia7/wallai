@@ -127,9 +127,9 @@ export function TransactionList({
       )}
 
       {loading ? (
-        <p className="text-xs text-white/40">Loading...</p>
+        <p className="text-xs text-white/70">Loading...</p>
       ) : transactions.length === 0 ? (
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-white/70">
           {bankAccountId || institutionId
             ? "No transactions yet."
             : "Select an account or institution to view transactions."}
@@ -145,7 +145,7 @@ export function TransactionList({
                 <p className="truncate text-xs font-medium text-white/90 sm:text-sm">
                   {tx.description}
                 </p>
-                <div className="mt-0.5 flex items-center gap-2 text-[10px] text-white/30">
+                <div className="mt-0.5 flex items-center gap-2 text-[10px] text-white/50">
                   <span>{new Date(tx.date).toLocaleDateString()}</span>
                   {(institutionId || !bankAccountId) && tx.bankAccount && (
                     <span className="truncate rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] text-white/50">
@@ -183,7 +183,7 @@ export function TransactionList({
 
                 <button
                   onClick={() => deleteTransaction(tx.id)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white/40 transition-colors sm:h-7 sm:w-7 sm:text-white/20 sm:opacity-0 sm:group-hover:opacity-100 sm:hover:bg-red-500/10 sm:hover:text-red-400"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors sm:h-7 sm:w-7 sm:text-white/20 sm:opacity-0 sm:group-hover:opacity-100 sm:hover:bg-red-500/10 sm:hover:text-red-400"
                   aria-label="Delete"
                 >
                   <svg className="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

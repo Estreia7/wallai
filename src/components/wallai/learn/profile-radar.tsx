@@ -41,7 +41,7 @@ function RadarPanel({
 }) {
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-      <p className="mb-2 text-[10px] uppercase tracking-wider text-white/40">{title}</p>
+      <p className="mb-2 text-[10px] uppercase tracking-wider text-white/70">{title}</p>
       <div className="h-56 w-full sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={data} outerRadius="70%">

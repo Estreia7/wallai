@@ -49,7 +49,7 @@ export default async function LearnPage() {
               const list = byCategory.get(key) ?? [];
               return (
                 <div key={key}>
-                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                  <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/70">
                     {categoryLabel(key)}
                   </h4>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">

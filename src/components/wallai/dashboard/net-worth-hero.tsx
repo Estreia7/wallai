@@ -41,7 +41,7 @@ export function NetWorthHero({ netWorth, freshness }: NetWorthHeroProps) {
 
   return (
     <GlassCard className="mb-4 sm:mb-6">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-white/40 sm:text-xs">
+      <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
         Net Worth
       </p>
       <p className="mt-1 text-3xl font-bold text-white sm:mt-2 sm:text-4xl xl:text-5xl">
@@ -60,9 +60,9 @@ export function NetWorthHero({ netWorth, freshness }: NetWorthHeroProps) {
           {netWorth.changePct!.toFixed(1)}%) vs last month
         </p>
       ) : (
-        <p className="mt-1 text-xs text-white/40 sm:text-sm">— vs last month</p>
+        <p className="mt-1 text-xs text-white/70 sm:text-sm">— vs last month</p>
       )}
-      <p className="mt-2 text-[10px] text-white/40 sm:text-xs">
+      <p className="mt-2 text-[10px] text-white/70 sm:text-xs">
         Net worth as of {formatDate(netWorth.asOf)} • Bank data updated{" "}
         {relativeFromNow(freshness.bankLastUpdated)}
       </p>

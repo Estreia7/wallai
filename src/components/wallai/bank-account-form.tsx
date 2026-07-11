@@ -193,7 +193,7 @@ export function BankAccountForm({
         <label className="mb-1.5 block text-xs font-medium text-white/60">
           Current balance
           {type === "credit" && (
-            <span className="ml-2 text-white/40">(use a negative number for debt)</span>
+            <span className="ml-2 text-white/70">(use a negative number for debt)</span>
           )}
         </label>
         <input
