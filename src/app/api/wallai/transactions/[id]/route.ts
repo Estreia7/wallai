@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { learnFromCorrection } from "@/lib/wallai/knowledge/matcher";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -37,6 +38,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body?.notes === null) data.notes = null;
 
   const updated = await prisma.transaction.update({ where: { id }, data });
+  if (typeof body?.category === "string" && body.category) {
+    await learnFromCorrection(session.user.id, updated.description, body.category);
+  }
   return NextResponse.json({ transaction: updated });
 }
 

@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { matchCategory, learnFromCategorization } from "@/lib/wallai/knowledge/matcher";
+import { enrichUnknownMerchants } from "@/lib/wallai/knowledge/categorize";
+import {
+  matchTransactionsToBills,
+  detectAndProposeBills,
+  checkMissingBills,
+  bootstrapBillHints,
+} from "@/lib/wallai/knowledge/bills";
+import { upsertTodo } from "@/lib/wallai/knowledge/todos";
 
 type ConfirmTransaction = {
   date: string;
@@ -143,6 +152,59 @@ export async function POST(request: Request) {
     }
   }
 
+  // ── Long-term knowledge pipeline ────────────────────────────────────
+  // Runs best-effort: a Haiku/API-key failure must never break the import.
+  let newMerchantCount = 0;
+  try {
+    const created = await prisma.transaction.findMany({
+      where: { userId, statementId: statement.id },
+      select: { id: true, description: true, amount: true, date: true, category: true },
+    });
+    const uncategorized = created
+      .filter((t) => !t.category)
+      .map((t) => ({ id: t.id, description: t.description, amount: t.amount }));
+
+    // 1. Memory match — auto-apply known merchants (0 AI).
+    const { hits, misses } = await matchCategory(userId, uncategorized);
+    for (const h of hits) {
+      await prisma.transaction.update({ where: { id: h.txId }, data: { category: h.category } });
+    }
+
+    // 2. Haiku enrichment for unknown merchants.
+    if (misses.length > 0) {
+      const enriched = await enrichUnknownMerchants(userId, misses);
+      const byId = new Map(misses.map((m) => [m.id, m]));
+      const learn: { description: string; category: string; displayName?: string }[] = [];
+      for (const e of enriched) {
+        await prisma.transaction.update({ where: { id: e.id }, data: { category: e.category } });
+        const tx = byId.get(e.id);
+        if (tx) learn.push({ description: tx.description, category: e.category, displayName: e.displayName });
+      }
+      await learnFromCategorization(userId, learn, "ai_guess");
+      newMerchantCount = learn.length;
+      if (newMerchantCount > 0) {
+        await upsertTodo(userId, {
+          type: "confirm_merchants",
+          dedupeKey: `confirm_merchants:${statement.id}`,
+          title: `Confirm categories for ${newMerchantCount} new merchant${newMerchantCount === 1 ? "" : "s"}`,
+          body: "WallAI guessed these — tap to confirm or fix so it learns.",
+          payload: { statementId: statement.id },
+        });
+      }
+    }
+
+    // 3. Recurring bills: match, detect, missing, bootstrap.
+    await matchTransactionsToBills(
+      userId,
+      created.map((t) => ({ date: t.date, description: t.description, amount: t.amount })),
+    );
+    await detectAndProposeBills(userId);
+    await checkMissingBills(userId, new Date());
+    await bootstrapBillHints(userId);
+  } catch (err) {
+    console.error("[confirm] knowledge pipeline error:", err);
+  }
+
   return NextResponse.json({
     statementId: statement.id,
     imported: insertResult.count,
@@ -150,5 +212,6 @@ export async function POST(request: Request) {
     primaryBalanceUpdated,
     secondaryBalancesUpdated,
     createdAccounts,
+    newMerchants: newMerchantCount,
   });
 }
