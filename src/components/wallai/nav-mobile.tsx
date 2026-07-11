@@ -87,10 +87,15 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
         />
       )}
 
-      {/* Slide-down menu panel */}
+      {/* Slide-down menu panel. Hidden with opacity+visibility (not just a
+          transform) so its bottom edge can't peek below the header — the panel
+          is anchored at top-14, so -translate-y-full alone left "Sign out"
+          visible and covered the header. */}
       <nav
-        className={`fixed left-0 right-0 top-14 z-40 transform border-b border-white/5 bg-[#0A0E1A]/95 backdrop-blur-xl transition-transform duration-200 ease-out lg:hidden ${
-          menuOpen ? "translate-y-0" : "-translate-y-full pointer-events-none"
+        className={`fixed left-0 right-0 top-14 z-30 border-b border-white/5 bg-[#0A0E1A]/95 backdrop-blur-xl transition-all duration-200 ease-out lg:hidden ${
+          menuOpen
+            ? "translate-y-0 opacity-100 visible"
+            : "-translate-y-2 opacity-0 invisible pointer-events-none"
         }`}
       >
         <div className="space-y-1 p-3">
