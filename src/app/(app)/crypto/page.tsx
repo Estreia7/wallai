@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export default async function CryptoPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect("/login");
   }
   const userId = session.user.id;
 

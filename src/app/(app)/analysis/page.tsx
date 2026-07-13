@@ -28,7 +28,7 @@ export default async function AnalysisPage({
 }) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect("/login");
   }
 
   const { period: rawPeriod } = await searchParams;

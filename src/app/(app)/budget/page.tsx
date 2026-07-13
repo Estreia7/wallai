@@ -124,7 +124,7 @@ export default async function BudgetPage({
   searchParams: Promise<{ year?: string; view?: string; month?: string }>;
 }) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
   const sp = await searchParams;

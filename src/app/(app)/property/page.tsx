@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function PropertyPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect("/login");
   }
   return (
     <div>

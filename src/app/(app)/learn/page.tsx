@@ -16,7 +16,7 @@ function categoryLabel(c: string | null): string {
 
 export default async function LearnPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/");
+  if (!session?.user?.id) redirect("/login");
 
   const [payload, tips] = await Promise.all([
     loadLearnPayload(session.user.id),

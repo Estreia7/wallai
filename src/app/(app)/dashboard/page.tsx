@@ -86,7 +86,7 @@ function DashboardErrorCard({ message }: { message: string }) {
 export default async function Dashboard() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/");
+    redirect("/login");
   }
   const userId = session.user.id;
   const userName = session.user.name ?? null;
