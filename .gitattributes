@@ -1,0 +1,6 @@
+# Force Unix line endings for files executed on the Linux VPS,
+# so embedded shell scripts don't fail on stray CR characters.
+*.yml text eol=lf
+*.yaml text eol=lf
+ecosystem.config.js text eol=lf
+*.sh text eol=lf
