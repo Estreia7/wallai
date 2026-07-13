@@ -1,32 +1,42 @@
-# Wallai
+# 💰 Wallai
 
 **Your money, understood by AI.**
 
 Wallai connects your bank accounts, budgets, crypto, debts and property into one calm dashboard — then uses Claude to explain what's actually happening with your money. Import a bank statement, and Wallai categorizes every transaction, learns your merchants, detects recurring bills, and rolls everything up into a single net-worth figure.
 
+<p>
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white">
+  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white">
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white">
+  <img alt="Claude" src="https://img.shields.io/badge/AI-Claude-D97757?logo=anthropic&logoColor=white">
+</p>
+
 ---
 
-## Features
+## ✨ Features
 
 | Area | What it does |
 | --- | --- |
-| **Dashboard** | Single net-worth figure across cash, crypto, debts and property, with income vs. expenses and asset allocation. |
-| **Bank & Transactions** | Import statements (CSV / XLSX / PDF), auto-deduplicated and categorized. Correct a category once and Wallai remembers the merchant. |
-| **Smart categorization** | Seeded merchant dictionary + fuzzy matching + per-user learned rules, with confidence scoring. Falls back to Claude only when needed. |
-| **Recurring bills** | Auto-detects subscriptions and utilities, surfaces them as to-dos to confirm. |
-| **Budget** | Per-category limits, month-to-date tracking, and a money-flow (Sankey) view that makes spending leaks obvious. |
-| **Crypto** | Track holdings with live prices via CoinGecko, valued in your primary currency. |
-| **Debts** | Loans, interest rates, payment schedules, and payoff tracking. |
-| **Property** | Real-estate valuations over time, optionally linked to a mortgage debt. |
-| **AI Analysis** | Financial insights and a chat assistant powered by Claude, with per-request token/cost usage tracking. |
-| **Learn** | A personal-finance reading list with AI-assisted book recommendations. |
-| **Net-worth history** | Daily snapshots so you can see the trend, not just the moment. |
+| 📊 **Dashboard** | Single net-worth figure across cash, crypto, debts and property, with income vs. expenses and asset allocation. |
+| 🏦 **Bank & Transactions** | Import statements (CSV / XLSX / PDF), auto-deduplicated and categorized. Correct a category once and Wallai remembers the merchant. |
+| 🏷️ **Smart categorization** | Seeded merchant dictionary + fuzzy matching + per-user learned rules, with confidence scoring. Falls back to Claude only when needed. |
+| 🔁 **Recurring bills** | Auto-detects subscriptions and utilities, surfaces them as to-dos to confirm. |
+| 🎯 **Budget** | Per-category limits, month-to-date tracking, and a money-flow (Sankey) view that makes spending leaks obvious. |
+| ₿ **Crypto** | Track holdings with live prices via CoinGecko, valued in your primary currency. |
+| 💳 **Debts** | Loans, interest rates, payment schedules, and payoff tracking. |
+| 🏠 **Property** | Real-estate valuations over time, optionally linked to a mortgage debt. |
+| 🤖 **AI Analysis** | Financial insights and a chat assistant powered by Claude, with per-request token/cost usage tracking. |
+| 📚 **Learn** | A personal-finance reading list with AI-assisted book recommendations. |
+| 📈 **Net-worth history** | Daily snapshots so you can see the trend, not just the moment. |
 
 Authentication supports **email + password** and **Sign in with Google**.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Framework:** Next.js 16 (App Router) + React 19
 - **Language:** TypeScript
@@ -39,7 +49,7 @@ Authentication supports **email + password** and **Sign in with Google**.
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -106,7 +116,7 @@ Open [http://localhost:3000](http://localhost:3000) — the marketing landing pa
 
 ---
 
-## Scripts
+## 📜 Scripts
 
 | Command | Description |
 | --- | --- |
@@ -119,7 +129,7 @@ Open [http://localhost:3000](http://localhost:3000) — the marketing landing pa
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
@@ -142,7 +152,7 @@ prisma/
 
 ---
 
-## Documentation
+## 📖 Documentation
 
 - [`developer/README.md`](developer/README.md) — full development workflow
 - [`docs/DESIGN.md`](docs/DESIGN.md) — design system
@@ -151,6 +161,6 @@ prisma/
 
 ---
 
-## Deployment
+## 🌐 Deployment
 
 The app is deployed to a self-hosted VPS via GitHub Actions ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) on push to `main`.
