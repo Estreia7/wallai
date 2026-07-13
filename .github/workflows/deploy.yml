@@ -64,7 +64,7 @@ jobs:
         run: |
           set -e
           for i in 1 2 3 4 5; do
-            HOME_STATUS=$(curl -sS -o /dev/null -w '%{http_code}' http://49.13.150.6:3003/)
+            HOME_STATUS=$(curl -sS -o /dev/null -w '%{http_code}' https://wallai.bruno-dev.xyz/)
             if [ "$HOME_STATUS" = "200" ] || [ "$HOME_STATUS" = "307" ] || [ "$HOME_STATUS" = "308" ]; then
               echo "✓ Deploy verified (home=$HOME_STATUS)"
               exit 0
