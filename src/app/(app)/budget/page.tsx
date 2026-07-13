@@ -12,6 +12,7 @@ import { BudgetMonthTable } from "@/components/wallai/budget/budget-month-table"
 import { ProjectionCard } from "@/components/wallai/budget/projection-card";
 import { BudgetYearChart } from "@/components/wallai/budget/budget-year-chart";
 import { BudgetMonthChart } from "@/components/wallai/budget/budget-month-chart";
+import { BudgetFlowChart } from "@/components/wallai/budget/budget-flow-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,17 @@ async function YearView({ userId, year }: { userId: string; year: number }) {
         <BudgetYearChart months={data.months} currency={data.currency} />
       </GlassCard>
 
+      <GlassCard>
+        <h3 className="mb-1 text-xs font-semibold text-white/70 sm:text-sm">Money flow — {year}</h3>
+        <p className="mb-3 text-[11px] text-white/50">Where income comes from and where it goes, as a share of total income.</p>
+        <BudgetFlowChart
+          income={data.income.map((r) => ({ category: r.category, amount: r.total }))}
+          expenses={data.expenses.map((r) => ({ category: r.category, amount: r.total }))}
+          net={data.totals.net}
+          currency={data.currency}
+        />
+      </GlassCard>
+
       <BudgetMatrixTable income={data.income} expenses={data.expenses} months={data.months} currency={data.currency} />
     </div>
   );
@@ -88,6 +100,17 @@ async function MonthView({ userId, year, month }: { userId: string; year: number
       <GlassCard>
         <h3 className="mb-3 text-xs font-semibold text-white/70 sm:text-sm">Top expenses — {monthName} {year}</h3>
         <BudgetMonthChart data={data.expenses.map((e) => ({ category: e.category, amount: e.amount }))} currency={data.currency} />
+      </GlassCard>
+
+      <GlassCard>
+        <h3 className="mb-1 text-xs font-semibold text-white/70 sm:text-sm">Money flow — {monthName} {year}</h3>
+        <p className="mb-3 text-[11px] text-white/50">Where income comes from and where it goes, as a share of total income.</p>
+        <BudgetFlowChart
+          income={data.income.map((e) => ({ category: e.category, amount: e.amount }))}
+          expenses={data.expenses.map((e) => ({ category: e.category, amount: e.amount }))}
+          net={data.totals.net}
+          currency={data.currency}
+        />
       </GlassCard>
 
       <BudgetMonthTable income={data.income} expenses={data.expenses} currency={data.currency} />
