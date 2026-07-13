@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   DashboardIcon,
   BankIcon,
@@ -28,14 +29,18 @@ const navItems = [
   { icon: <AnalysisIcon />, label: "Analysis", href: "/analysis" },
   { icon: <BudgetIcon />, label: "Budget", href: "/budget" },
   { icon: <LearnIcon />, label: "Learn", href: "/learn" },
-  { icon: <UsageIcon />, label: "AI Usage", href: "/usage" },
   { icon: <SettingsIcon />, label: "Settings", href: "/settings" },
 ];
+
+const adminItem = { icon: <UsageIcon />, label: "Admin", href: "/admin" };
 
 export function NavMobile({ onLogout }: { onLogout: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [todoCount, setTodoCount] = useState(0);
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const items =
+    session?.user?.role === "admin" ? [...navItems, adminItem] : navItems;
 
   // Close menu on route change
   useEffect(() => {
@@ -111,7 +116,7 @@ export function NavMobile({ onLogout }: { onLogout: () => void }) {
         }`}
       >
         <div className="space-y-1 p-3">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link

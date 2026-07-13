@@ -5,22 +5,31 @@ import { calculateCost } from "@/lib/pricing";
 
 export class ApiKeyNotConfiguredError extends Error {
   constructor() {
-    super("Anthropic API key not configured. Please add it in Settings.");
+    super("AI is not available yet. The administrator hasn't configured an Anthropic API key.");
     this.name = "ApiKeyNotConfiguredError";
   }
 }
 
-export async function getAnthropicClient(userId: string): Promise<Anthropic> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
+/** Resolve the admin-owned, app-wide Anthropic key (shared by all users). */
+async function getSharedApiKey(): Promise<string> {
+  const admin = await prisma.user.findFirst({
+    where: { role: "admin", anthropicKeyEncrypted: { not: null } },
     select: { anthropicKeyEncrypted: true },
+    orderBy: { createdAt: "asc" },
   });
-
-  if (!user?.anthropicKeyEncrypted) {
+  if (!admin?.anthropicKeyEncrypted) {
     throw new ApiKeyNotConfiguredError();
   }
+  return decrypt(admin.anthropicKeyEncrypted);
+}
 
-  const apiKey = decrypt(user.anthropicKeyEncrypted);
+/**
+ * Returns an Anthropic client backed by the shared admin key. The `userId`
+ * parameter is retained for call-site compatibility and usage attribution;
+ * the key itself is app-wide, not per-user.
+ */
+export async function getAnthropicClient(_userId: string): Promise<Anthropic> {
+  const apiKey = await getSharedApiKey();
   return new Anthropic({ apiKey });
 }
 

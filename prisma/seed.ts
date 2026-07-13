@@ -345,20 +345,26 @@ for (const b of CURATED_BOOKS) {
 }
 
 async function main() {
-  const passwordHash = await bcrypt.hash("1234", 12);
+  // The admin account. Login: type "admin" (mapped to this email) / password below.
+  const adminPasswordHash = await bcrypt.hash("adminwallai", 12);
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@wallai.app" },
-    update: {},
+    update: {
+      // Keep the admin promoted and its password in sync with the seed.
+      role: "admin",
+      passwordHash: adminPasswordHash,
+    },
     create: {
       name: "Admin",
       email: "admin@wallai.app",
-      passwordHash,
+      passwordHash: adminPasswordHash,
       primaryCurrency: "EUR",
+      role: "admin",
     },
   });
 
-  console.log("Seeded admin user:", admin.email);
+  console.log("Seeded admin user:", admin.email, `(role=${admin.role})`);
 
   // Seed default category taxonomy for every existing user (idempotent).
   const allUsers = await prisma.user.findMany({ select: { id: true } });
