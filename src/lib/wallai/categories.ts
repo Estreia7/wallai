@@ -1,33 +1,18 @@
 import type { Transaction } from "@prisma/client";
+import {
+  DEFAULT_INCOME_NAMES,
+  DEFAULT_EXPENSE_NAMES,
+  DEFAULT_TRANSFER_NAMES,
+} from "./default-taxonomy";
 
-export const INCOME_CATEGORIES = [
-  "Salary",
-  "Freelance",
-  "Refund",
-  "Interest",
-  "Other Income",
-] as const;
-
-export const EXPENSE_CATEGORIES = [
-  "Groceries",
-  "Dining",
-  "Transport",
-  "Shopping",
-  "Bills & Utilities",
-  "Subscriptions",
-  "Entertainment",
-  "Health",
-  "Housing",
-  "Travel",
-  "Cash",
-  "Fees",
-  "Other Expense",
-] as const;
-
-// Transfers are movements between the user's own accounts — not real
-// income or expense. Kept as selectable categories but excluded from
-// all totals, charts, and savings-rate calculations.
-export const TRANSFER_CATEGORIES = ["Transfer In", "Transfer Out"] as const;
+// These constants are the DEFAULT taxonomy, used as:
+//   - the seed source for a new user's categories,
+//   - the fallback classification sets when no per-user sets are supplied,
+//   - the default AI-prompt allowed list.
+// Per-user categories (categories-data.ts) override these at runtime.
+export const INCOME_CATEGORIES = DEFAULT_INCOME_NAMES;
+export const EXPENSE_CATEGORIES = DEFAULT_EXPENSE_NAMES;
+export const TRANSFER_CATEGORIES = DEFAULT_TRANSFER_NAMES;
 
 export const ALL_CATEGORIES: readonly string[] = [
   ...INCOME_CATEGORIES,
@@ -35,22 +20,39 @@ export const ALL_CATEGORIES: readonly string[] = [
   ...TRANSFER_CATEGORIES,
 ];
 
-const INCOME_SET = new Set<string>(INCOME_CATEGORIES);
-const TRANSFER_SET = new Set<string>(TRANSFER_CATEGORIES);
+const DEFAULT_INCOME_SET = new Set<string>(INCOME_CATEGORIES);
+const DEFAULT_TRANSFER_SET = new Set<string>(TRANSFER_CATEGORIES);
 
-export function isTransfer(tx: Pick<Transaction, "category">): boolean {
-  return !!tx.category && TRANSFER_SET.has(tx.category);
+/** Optional per-user membership sets; falls back to defaults when omitted. */
+export type ClassifySets = { income: Set<string>; transfer: Set<string> };
+
+export function isTransfer(
+  tx: Pick<Transaction, "category">,
+  sets?: ClassifySets,
+): boolean {
+  const transferSet = sets?.transfer ?? DEFAULT_TRANSFER_SET;
+  return !!tx.category && transferSet.has(tx.category);
 }
 
-export function isIncome(tx: Pick<Transaction, "category" | "amount">): boolean {
-  if (tx.category && TRANSFER_SET.has(tx.category)) return false;
-  if (tx.category && INCOME_SET.has(tx.category)) return true;
+export function isIncome(
+  tx: Pick<Transaction, "category" | "amount">,
+  sets?: ClassifySets,
+): boolean {
+  const incomeSet = sets?.income ?? DEFAULT_INCOME_SET;
+  const transferSet = sets?.transfer ?? DEFAULT_TRANSFER_SET;
+  if (tx.category && transferSet.has(tx.category)) return false;
+  if (tx.category && incomeSet.has(tx.category)) return true;
   if (!tx.category && tx.amount > 0) return true;
   return false;
 }
 
-export function isExpense(tx: Pick<Transaction, "category" | "amount">): boolean {
-  if (tx.category && TRANSFER_SET.has(tx.category)) return false;
-  if (tx.category && INCOME_SET.has(tx.category)) return false;
+export function isExpense(
+  tx: Pick<Transaction, "category" | "amount">,
+  sets?: ClassifySets,
+): boolean {
+  const incomeSet = sets?.income ?? DEFAULT_INCOME_SET;
+  const transferSet = sets?.transfer ?? DEFAULT_TRANSFER_SET;
+  if (tx.category && transferSet.has(tx.category)) return false;
+  if (tx.category && incomeSet.has(tx.category)) return false;
   return tx.amount < 0;
 }

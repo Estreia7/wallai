@@ -19,16 +19,30 @@ export async function POST() {
 
   try {
     const { hits, misses } = await matchCategory(userId, uncategorized);
+    const byId = new Map(uncategorized.map((m) => [m.id, m]));
+
     for (const h of hits) {
       await prisma.transaction.update({ where: { id: h.txId }, data: { category: h.category } });
     }
 
+    // Persist seed-dictionary matches as learned rules so repeat merchants
+    // resolve instantly next time and feed recurring-bill detection.
+    const seedLearn: { description: string; category: string; displayName?: string }[] = [];
+    for (const h of hits) {
+      if (h.via !== "seed") continue;
+      const tx = byId.get(h.txId);
+      if (tx) seedLearn.push({ description: tx.description, category: h.category, displayName: h.displayName });
+    }
+    if (seedLearn.length > 0) await learnFromCategorization(userId, seedLearn, "seed");
+
     let aiCount = 0;
     if (misses.length > 0) {
       const enriched = await enrichUnknownMerchants(userId, misses);
-      const byId = new Map(misses.map((m) => [m.id, m]));
       const learn: { description: string; category: string; displayName?: string }[] = [];
       for (const e of enriched) {
+        // Low-confidence guesses leave the transaction uncategorized for review
+        // instead of forcing it into a wrong/"Other" bucket.
+        if (!e.category) continue;
         await prisma.transaction.update({ where: { id: e.id }, data: { category: e.category } });
         const tx = byId.get(e.id);
         if (tx) learn.push({ description: tx.description, category: e.category, displayName: e.displayName });

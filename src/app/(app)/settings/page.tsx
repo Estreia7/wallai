@@ -5,6 +5,7 @@ import { ProfileCard } from "@/components/wallai/settings/profile-card";
 import { CurrencyCard } from "@/components/wallai/settings/currency-card";
 import { ApiKeyCard } from "@/components/wallai/api-key-card";
 import { UsageCard } from "@/components/wallai/settings/usage-card";
+import { CategoriesCard } from "@/components/wallai/settings/categories-card";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default async function SettingsPage() {
           <CurrencyCard initialCurrency={user.primaryCurrency} />
           <ApiKeyCard />
         </div>
+        <CategoriesCard />
         <div>
           <UsageCard />
         </div>

@@ -1,0 +1,26 @@
+# Local development database only. Production runs its own Postgres on the VPS.
+# Usage:
+#   docker compose up -d        # start local Postgres
+#   npx prisma migrate dev      # apply migrations to it
+#   npx prisma db seed          # seed books + default categories
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wallai-dev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wallai
+      POSTGRES_PASSWORD: wallai
+      POSTGRES_DB: wallai
+    ports:
+      - "5432:5432"
+    volumes:
+      - wallai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallai -d wallai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  wallai_pgdata:

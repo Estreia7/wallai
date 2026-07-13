@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
 import { LEARN_TRAITS, TRAIT_COUNT } from "../src/lib/wallai/learn/traits";
+import { DEFAULT_TAXONOMY, GROUP_COLORS } from "../src/lib/wallai/default-taxonomy";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -358,6 +359,47 @@ async function main() {
   });
 
   console.log("Seeded admin user:", admin.email);
+
+  // Seed default category taxonomy for every existing user (idempotent).
+  const allUsers = await prisma.user.findMany({ select: { id: true } });
+  for (const u of allUsers) {
+    const existing = await prisma.category.findMany({
+      where: { userId: u.id },
+      select: { name: true },
+    });
+    const have = new Set(existing.map((c) => c.name));
+    const missing = DEFAULT_TAXONOMY.filter((t) => !have.has(t.name));
+    let order = have.size;
+    for (const t of missing) {
+      await prisma.category.create({
+        data: {
+          userId: u.id,
+          name: t.name,
+          kind: t.kind,
+          group: t.group,
+          color: t.color ?? GROUP_COLORS[t.group] ?? null,
+          icon: t.icon ?? null,
+          isDefault: true,
+          sortOrder: order++,
+        },
+      });
+    }
+    // Link parents by name.
+    const rows = await prisma.category.findMany({
+      where: { userId: u.id },
+      select: { id: true, name: true },
+    });
+    const idByName = new Map(rows.map((r) => [r.name, r.id]));
+    for (const t of DEFAULT_TAXONOMY) {
+      if (!t.parent) continue;
+      const parentId = idByName.get(t.parent);
+      const childId = idByName.get(t.name);
+      if (parentId && childId) {
+        await prisma.category.update({ where: { id: childId }, data: { parentId } });
+      }
+    }
+  }
+  console.log(`Seeded categories for ${allUsers.length} user(s).`);
 
   // Seed financial tips
   const tips = [

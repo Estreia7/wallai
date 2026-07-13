@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { normalizeMerchant } from "./normalize";
+import { matchSeedMerchant } from "./seed-merchants";
 
 export const SOURCE_RANK: Record<string, number> = {
-  ai_guess: 1,
-  confirmed: 2,
-  user_correction: 3,
+  seed: 1,
+  ai_guess: 2,
+  confirmed: 3,
+  user_correction: 4,
 };
 
 export function higherSource(a: string, b: string): string {
@@ -13,20 +15,78 @@ export function higherSource(a: string, b: string): string {
 
 type TxLite = { id: string; description: string; amount: number };
 
+export type MatchHit = {
+  txId: string;
+  category: string;
+  /** How the category was resolved. Used to decide whether to learn a rule. */
+  via: "rule" | "rule_fuzzy" | "seed";
+  ruleId?: string;
+  displayName?: string;
+  recurring?: boolean;
+};
+
+/**
+ * Resolve categories deterministically, before any AI call. Order of precedence:
+ *   1. Learned rule, exact normalized-key match (fastest, most authoritative).
+ *   2. Learned rule, fuzzy key match — one learned key is a substring of the
+ *      other (covers "uber eats" vs "uber eats lisboa" city variants).
+ *   3. Built-in seed dictionary of common PT/EU merchants.
+ * Anything unresolved becomes a `miss` for the AI pass.
+ */
 export async function matchCategory(
   userId: string,
   txs: TxLite[],
-): Promise<{ hits: { txId: string; category: string; ruleId: string }[]; misses: TxLite[] }> {
+): Promise<{ hits: MatchHit[]; misses: TxLite[] }> {
   const rules = await prisma.merchantRule.findMany({ where: { userId } });
   const byKey = new Map(rules.map((r) => [r.merchantKey, r]));
-  const hits: { txId: string; category: string; ruleId: string }[] = [];
+  // Precompute rule keys sorted longest-first so fuzzy match prefers the most
+  // specific learned merchant.
+  const ruleKeys = rules
+    .map((r) => r.merchantKey)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  const hits: MatchHit[] = [];
   const misses: TxLite[] = [];
+
   for (const tx of txs) {
     const { merchantKey } = normalizeMerchant(tx.description);
-    const rule = merchantKey ? byKey.get(merchantKey) : undefined;
-    if (rule) hits.push({ txId: tx.id, category: rule.category, ruleId: rule.id });
-    else misses.push(tx);
+
+    // 1. exact learned rule
+    const exact = merchantKey ? byKey.get(merchantKey) : undefined;
+    if (exact) {
+      hits.push({ txId: tx.id, category: exact.category, via: "rule", ruleId: exact.id });
+      continue;
+    }
+
+    // 2. fuzzy learned rule (bidirectional substring on the normalized key)
+    if (merchantKey && merchantKey.length >= 4) {
+      const fuzzyKey = ruleKeys.find(
+        (k) => k.length >= 4 && (merchantKey.includes(k) || k.includes(merchantKey)),
+      );
+      const fuzzyRule = fuzzyKey ? byKey.get(fuzzyKey) : undefined;
+      if (fuzzyRule) {
+        hits.push({ txId: tx.id, category: fuzzyRule.category, via: "rule_fuzzy", ruleId: fuzzyRule.id });
+        continue;
+      }
+    }
+
+    // 3. built-in seed dictionary
+    const seed = matchSeedMerchant(tx.description, tx.amount);
+    if (seed) {
+      hits.push({
+        txId: tx.id,
+        category: seed.category,
+        via: "seed",
+        displayName: seed.displayName,
+        recurring: seed.recurring,
+      });
+      continue;
+    }
+
+    misses.push(tx);
   }
+
   return { hits, misses };
 }
 

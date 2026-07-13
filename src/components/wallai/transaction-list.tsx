@@ -14,8 +14,6 @@ export type Transaction = {
   bankAccount?: { id: string; name: string; currency: string };
 };
 
-const COMMON_CATEGORIES = ALL_CATEGORIES;
-
 export function TransactionList({
   bankAccountId,
   institutionId,
@@ -30,6 +28,24 @@ export function TransactionList({
   const [categoryFilter, setCategoryFilter] = useState("");
   const [categorizing, setCategorizing] = useState(false);
   const [categorizeError, setCategorizeError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([...ALL_CATEGORIES]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/wallai/categories")
+      .then((r) => r.json())
+      .then((d: { categories?: { name: string; archived?: boolean }[] }) => {
+        if (cancelled || !d.categories) return;
+        setCategories(d.categories.filter((c) => !c.archived).map((c) => c.name));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -39,11 +55,14 @@ export function TransactionList({
     } else if (institutionId) {
       params.set("institutionId", institutionId);
     }
-    if (categoryFilter) params.set("category", categoryFilter);
+    // "__review__" is a client-side filter (uncategorized + Other), so we fetch
+    // everything and narrow below. Any real category filters server-side.
+    if (categoryFilter && categoryFilter !== "__review__") params.set("category", categoryFilter);
 
     const res = await fetch(`/api/wallai/transactions?${params}`);
     const data = await res.json();
     setTransactions(data.transactions || []);
+    setSelected(new Set());
     setLoading(false);
   }, [bankAccountId, institutionId, categoryFilter]);
 
@@ -68,6 +87,31 @@ export function TransactionList({
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   }
 
+  function toggleSelected(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function bulkAssign() {
+    if (selected.size === 0 || !bulkCategory) return;
+    setBulkBusy(true);
+    try {
+      await fetch("/api/wallai/transactions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [...selected], category: bulkCategory }),
+      });
+      await load();
+      setBulkCategory("");
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
   async function autoCategorize() {
     setCategorizing(true);
     setCategorizeError(null);
@@ -89,6 +133,25 @@ export function TransactionList({
   }
 
   const uncategorizedCount = transactions.filter((t) => !t.category).length;
+
+  const needsReview = (t: Transaction) =>
+    !t.category || t.category === "Other Expense" || t.category === "Other Income";
+  const visible =
+    categoryFilter === "__review__" ? transactions.filter(needsReview) : transactions;
+  const allVisibleSelected = visible.length > 0 && visible.every((t) => selected.has(t.id));
+
+  function toggleSelectAll() {
+    setSelected((prev) => {
+      if (visible.every((t) => prev.has(t.id))) {
+        const next = new Set(prev);
+        visible.forEach((t) => next.delete(t.id));
+        return next;
+      }
+      const next = new Set(prev);
+      visible.forEach((t) => next.add(t.id));
+      return next;
+    });
+  }
 
   return (
     <GlassCard>
@@ -113,7 +176,8 @@ export function TransactionList({
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 outline-none focus:border-white/20"
           >
             <option value="">All categories</option>
-            {COMMON_CATEGORIES.map((c) => (
+            <option value="__review__">⚠ Needs review (Other / uncategorized)</option>
+            {categories.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -126,21 +190,71 @@ export function TransactionList({
         <p className="mb-3 text-xs text-red-400">⚠ {categorizeError}</p>
       )}
 
+      {/* Bulk assignment bar */}
+      {visible.length > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-2 py-1.5 text-xs">
+          <label className="flex cursor-pointer items-center gap-1.5 text-white/60">
+            <input
+              type="checkbox"
+              checked={allVisibleSelected}
+              onChange={toggleSelectAll}
+              className="h-3.5 w-3.5 accent-emerald-400"
+            />
+            Select all
+          </label>
+          <span className="text-white/30">•</span>
+          <span className="text-white/50">{selected.size} selected</span>
+          <div className="ml-auto flex items-center gap-2">
+            <select
+              value={bulkCategory}
+              onChange={(e) => setBulkCategory(e.target.value)}
+              disabled={selected.size === 0}
+              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80 outline-none focus:border-white/20 disabled:opacity-40"
+            >
+              <option value="">Assign category…</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <button
+              onClick={bulkAssign}
+              disabled={selected.size === 0 || !bulkCategory || bulkBusy}
+              className="rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
+            >
+              {bulkBusy ? "Applying…" : "Apply"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <p className="text-xs text-white/70">Loading...</p>
-      ) : transactions.length === 0 ? (
+      ) : visible.length === 0 ? (
         <p className="text-xs text-white/70">
-          {bankAccountId || institutionId
-            ? "No transactions yet."
-            : "Select an account or institution to view transactions."}
+          {categoryFilter === "__review__"
+            ? "Nothing needs review — everything is categorized. 🎉"
+            : bankAccountId || institutionId
+              ? "No transactions yet."
+              : "Select an account or institution to view transactions."}
         </p>
       ) : (
         <div className="space-y-2">
-          {transactions.map((tx) => (
+          {visible.map((tx) => (
             <div
               key={tx.id}
-              className="group flex flex-col gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5 hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+              className={`group flex flex-col gap-2 rounded-xl border px-3 py-2.5 hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 ${
+                selected.has(tx.id)
+                  ? "border-emerald-400/40 bg-emerald-400/[0.05]"
+                  : "border-white/5 bg-white/[0.02]"
+              }`}
             >
+              <input
+                type="checkbox"
+                checked={selected.has(tx.id)}
+                onChange={() => toggleSelected(tx.id)}
+                className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-emerald-400 sm:mt-0"
+                aria-label="Select transaction"
+              />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-medium text-white/90 sm:text-sm">
                   {tx.description}
@@ -165,7 +279,7 @@ export function TransactionList({
                   className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-2 py-2 text-xs text-white/70 outline-none focus:border-white/20 sm:w-28 sm:flex-none sm:px-1.5 sm:py-1 sm:text-[10px]"
                 >
                   <option value="">Uncategorized</option>
-                  {COMMON_CATEGORIES.map((c) => (
+                  {categories.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>

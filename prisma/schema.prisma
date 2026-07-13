@@ -38,6 +38,7 @@ model User {
   merchantRules     MerchantRule[]
   recurringBills    RecurringBill[]
   todos             Todo[]
+  categories        Category[]
 
   anthropicKeyEncrypted String?
 }
@@ -296,6 +297,34 @@ model MerchantRule {
 
   @@unique([userId, merchantKey])
   @@index([userId])
+}
+
+// User-defined expense/income categories. Transactions reference categories by
+// NAME (Transaction.category string) rather than FK, so existing rows keep
+// working and merges/renames are string rewrites. This table drives the
+// taxonomy: grouping, subcategories, colors, and the AI prompt's allowed list.
+model Category {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  kind      String // "income" | "expense" | "transfer"
+  group     String? // e.g. "Essentials" | "Lifestyle" | "Financial" | "Income"
+  parentId  String? // subcategory of another Category (same user)
+  color     String? // hex, for charts/badges
+  icon      String? // emoji or icon key
+  isDefault Boolean  @default(false) // seeded vs user-created
+  archived  Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  @@unique([userId, name])
+  @@index([userId, kind])
+  @@index([parentId])
 }
 
 model RecurringBill {

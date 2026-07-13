@@ -1,11 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import {
-  INCOME_CATEGORIES,
-  EXPENSE_CATEGORIES,
   isIncome,
   isExpense,
   isTransfer,
 } from "@/lib/wallai/categories";
+import { getCategorySets, type CategorySets } from "@/lib/wallai/categories-data";
 import { buildConverter } from "@/lib/wallai/fx";
 import { projectYear, type Projection } from "@/lib/wallai/budget-projection";
 
@@ -39,14 +38,11 @@ export type BudgetMonthData = {
   totals: BudgetTotals;
 };
 
-const INCOME_SET = new Set<string>(INCOME_CATEGORIES);
-const EXPENSE_SET = new Set<string>(EXPENSE_CATEGORIES);
-
-function incomeCat(category: string | null): string {
-  return category && INCOME_SET.has(category) ? category : "Other Income";
+function incomeCat(category: string | null, sets: CategorySets): string {
+  return category && sets.income.has(category) ? category : "Other Income";
 }
-function expenseCat(category: string | null): string {
-  return category && EXPENSE_SET.has(category) ? category : "Other Expense";
+function expenseCat(category: string | null, sets: CategorySets): string {
+  return category && sets.expense.has(category) ? category : "Other Expense";
 }
 function savings(income: number, expenses: number): number | null {
   return income > 0 ? ((income - expenses) / income) * 100 : null;
@@ -69,7 +65,7 @@ export async function getBudgetYear(userId: string, year: number): Promise<Budge
   const start = new Date(Date.UTC(year, 0, 1));
   const end = new Date(Date.UTC(year + 1, 0, 1));
 
-  const [user, transactions, activeBills] = await Promise.all([
+  const [user, transactions, activeBills, sets] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { primaryCurrency: true } }),
     prisma.transaction.findMany({
       where: { userId, date: { gte: start, lt: end } },
@@ -79,6 +75,7 @@ export async function getBudgetYear(userId: string, year: number): Promise<Budge
       where: { userId, status: "active", cadence: "monthly" },
       select: { expectedAmount: true },
     }),
+    getCategorySets(userId),
   ]);
 
   const currency = user?.primaryCurrency ?? "EUR";
@@ -99,19 +96,19 @@ export async function getBudgetYear(userId: string, year: number): Promise<Budge
   };
 
   for (const tx of transactions) {
-    if (isTransfer(tx)) continue;
+    if (isTransfer(tx, sets)) continue;
     const mi = tx.date.getUTCMonth();
     const converted = toPrimary(tx.amount, tx.currency);
-    if (isIncome(tx)) {
+    if (isIncome(tx, sets)) {
       const amt = converted;
       months[mi].income += amt;
       incomeTotal += amt;
-      ensure(incomeByCat, incomeCat(tx.category))[mi] += amt;
-    } else if (isExpense(tx)) {
+      ensure(incomeByCat, incomeCat(tx.category, sets))[mi] += amt;
+    } else if (isExpense(tx, sets)) {
       const amt = Math.abs(converted);
       months[mi].expenses += amt;
       expenseTotal += amt;
-      ensure(expenseByCat, expenseCat(tx.category))[mi] += amt;
+      ensure(expenseByCat, expenseCat(tx.category, sets))[mi] += amt;
     }
   }
   for (const m of months) m.net = m.income - m.expenses;
@@ -151,12 +148,13 @@ export async function getBudgetMonth(userId: string, year: number, month: number
   const curEnd = new Date(Date.UTC(year, month, 1));
   const prevStart = new Date(Date.UTC(year, month - 2, 1));
 
-  const [user, transactions] = await Promise.all([
+  const [user, transactions, sets] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { primaryCurrency: true } }),
     prisma.transaction.findMany({
       where: { userId, date: { gte: prevStart, lt: curEnd } },
       select: { amount: true, currency: true, category: true, date: true },
     }),
+    getCategorySets(userId),
   ]);
 
   const currency = user?.primaryCurrency ?? "EUR";
@@ -172,17 +170,17 @@ export async function getBudgetMonth(userId: string, year: number, month: number
   let expenseTotal = 0;
 
   for (const tx of transactions) {
-    if (isTransfer(tx)) continue;
+    if (isTransfer(tx, sets)) continue;
     const isCur = tx.date >= curStart;
     const converted = toPrimary(tx.amount, tx.currency);
-    if (isIncome(tx)) {
+    if (isIncome(tx, sets)) {
       const amt = converted;
-      const cat = incomeCat(tx.category);
+      const cat = incomeCat(tx.category, sets);
       if (isCur) { curInc.set(cat, (curInc.get(cat) ?? 0) + amt); incomeTotal += amt; }
       else prevInc.set(cat, (prevInc.get(cat) ?? 0) + amt);
-    } else if (isExpense(tx)) {
+    } else if (isExpense(tx, sets)) {
       const amt = Math.abs(converted);
-      const cat = expenseCat(tx.category);
+      const cat = expenseCat(tx.category, sets);
       if (isCur) { curExp.set(cat, (curExp.get(cat) ?? 0) + amt); expenseTotal += amt; }
       else prevExp.set(cat, (prevExp.get(cat) ?? 0) + amt);
     }
