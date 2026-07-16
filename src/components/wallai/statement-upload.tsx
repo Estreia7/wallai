@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GlassCard } from "./glass-card";
 import { Modal } from "./modal";
+import { ParsingProgress } from "./parsing-progress";
 import {
   StatementReviewTable,
   type ReviewTransaction,
@@ -31,6 +32,7 @@ export function StatementUpload({
   onImported: () => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [parseDone, setParseDone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -44,6 +46,7 @@ export function StatementUpload({
     }
 
     setUploading(true);
+    setParseDone(false);
     setError("");
     setSuccess("");
 
@@ -72,6 +75,10 @@ export function StatementUpload({
         return;
       }
 
+      // Snap the bar to 100% and let the user see it land before the review opens.
+      setParseDone(true);
+      await new Promise((r) => setTimeout(r, 550));
+
       setParseResult({
         transactions: data.transactions ?? [],
         primaryBalance: data.primaryBalance ?? null,
@@ -85,6 +92,7 @@ export function StatementUpload({
     }
 
     setUploading(false);
+    setParseDone(false);
   }
 
   async function handleConfirm(payload: ReviewConfirmPayload) {
@@ -180,7 +188,7 @@ export function StatementUpload({
                 className="hidden"
               />
               {uploading ? (
-                <p className="text-sm text-white/60">Parsing with Claude...</p>
+                <ParsingProgress done={parseDone} />
               ) : (
                 <>
                   <svg className="mb-2 h-8 w-8 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
