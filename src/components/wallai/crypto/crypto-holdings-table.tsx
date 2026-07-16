@@ -40,11 +40,58 @@ export function CryptoHoldingsTable({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // "Add more" — buy additional units of a coin already held. Increments the
+  // existing quantity and recomputes the weighted-average cost.
+  const [adding, setAdding] = useState<HoldingWithLivePrice | null>(null);
+  const [addQuantity, setAddQuantity] = useState("");
+  const [addCost, setAddCost] = useState("");
+
   function openEdit(h: HoldingWithLivePrice) {
     setEditing(h);
     setEditQuantity(String(h.quantity));
     setEditAvgCost(String(h.avgCostEur));
     setError(null);
+  }
+
+  function openAdd(h: HoldingWithLivePrice) {
+    setAdding(h);
+    setAddQuantity("");
+    // Default the cost to the current live price if known, else blank.
+    setAddCost(h.priceEur !== null ? String(h.priceEur) : "");
+    setError(null);
+  }
+
+  async function saveAdd() {
+    if (!adding) return;
+    const quantity = Number(addQuantity);
+    const avgCostEur = Number(addCost);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setError("Quantity to add must be a positive number");
+      return;
+    }
+    if (!Number.isFinite(avgCostEur) || avgCostEur < 0) {
+      setError("Cost must be 0 or a positive number");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      // POST /holdings merges into the existing holding for this coin.
+      const res = await fetch("/api/wallai/crypto/holdings", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ coinId: adding.coinId, quantity, avgCostEur }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        setError(j.error ?? "Failed to add");
+        return;
+      }
+      setAdding(null);
+      router.refresh();
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function saveEdit() {
@@ -140,6 +187,12 @@ export function CryptoHoldingsTable({
                 </div>
                 <div className="mt-2 flex justify-end gap-1 border-t border-white/5 pt-2">
                   <button
+                    onClick={() => openAdd(h)}
+                    className="rounded-md px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/10"
+                  >
+                    + Add more
+                  </button>
+                  <button
                     onClick={() => openEdit(h)}
                     className="rounded-md px-3 py-1.5 text-xs text-white/70 hover:bg-white/10 hover:text-white"
                   >
@@ -198,8 +251,14 @@ export function CryptoHoldingsTable({
                     </td>
                     <td className="py-2.5 text-right">
                       <button
+                        onClick={() => openAdd(h)}
+                        className="rounded-md px-2 py-1 text-[10px] font-medium text-emerald-300 hover:bg-emerald-500/10 sm:text-xs"
+                      >
+                        + Add
+                      </button>
+                      <button
                         onClick={() => openEdit(h)}
-                        className="rounded-md px-2 py-1 text-[10px] text-white/60 hover:bg-white/10 hover:text-white sm:text-xs"
+                        className="ml-1 rounded-md px-2 py-1 text-[10px] text-white/60 hover:bg-white/10 hover:text-white sm:text-xs"
                       >
                         Edit
                       </button>
@@ -262,6 +321,75 @@ export function CryptoHoldingsTable({
               className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#0A0E1A] hover:bg-emerald-400 disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={adding !== null}
+        onClose={() => setAdding(null)}
+        title={adding ? `Add more ${adding.symbol}` : "Add more"}
+      >
+        <div className="space-y-4">
+          {adding && (
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/70">
+              You currently hold{" "}
+              <span className="font-semibold text-white tabular-nums">
+                {formatQty(adding.quantity)} {adding.symbol}
+              </span>{" "}
+              at avg {formatCurrency(adding.avgCostEur)}.
+            </div>
+          )}
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-white/60">Quantity to add</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              step="any"
+              autoFocus
+              value={addQuantity}
+              onChange={(e) => setAddQuantity(e.target.value)}
+              placeholder="e.g. 5"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-white/60">Cost of this purchase (€ per unit)</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              step="any"
+              value={addCost}
+              onChange={(e) => setAddCost(e.target.value)}
+              placeholder="e.g. 42500"
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30"
+            />
+          </label>
+          {adding && Number(addQuantity) > 0 && (
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-200">
+              New total:{" "}
+              <span className="font-semibold tabular-nums">
+                {formatQty(adding.quantity + Number(addQuantity))} {adding.symbol}
+              </span>
+            </div>
+          )}
+          {error && <p className="text-xs text-red-400">{error}</p>}
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setAdding(null)}
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 hover:bg-white/10"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={saveAdd}
+              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#0A0E1A] hover:bg-emerald-400 disabled:opacity-50"
+            >
+              {saving ? "Adding…" : "Add to holding"}
             </button>
           </div>
         </div>
