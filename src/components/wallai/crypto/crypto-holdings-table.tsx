@@ -49,30 +49,32 @@ export function CryptoHoldingsTable({
   function openEdit(h: HoldingWithLivePrice) {
     setEditing(h);
     setEditQuantity(String(h.quantity));
-    setEditAvgCost(String(h.avgCostEur));
+    // Edit works in total-invested terms too: prefill qty × avg cost.
+    setEditAvgCost(String(Number((h.quantity * h.avgCostEur).toFixed(2))));
     setError(null);
   }
 
   function openAdd(h: HoldingWithLivePrice) {
     setAdding(h);
     setAddQuantity("");
-    // Default the cost to the current live price if known, else blank.
-    setAddCost(h.priceEur !== null ? String(h.priceEur) : "");
+    setAddCost("");
     setError(null);
   }
 
   async function saveAdd() {
     if (!adding) return;
     const quantity = Number(addQuantity);
-    const avgCostEur = Number(addCost);
+    const invested = Number(addCost); // total € spent on this purchase
     if (!Number.isFinite(quantity) || quantity <= 0) {
       setError("Quantity to add must be a positive number");
       return;
     }
-    if (!Number.isFinite(avgCostEur) || avgCostEur < 0) {
-      setError("Cost must be 0 or a positive number");
+    if (!Number.isFinite(invested) || invested < 0) {
+      setError("Amount invested must be 0 or a positive number");
       return;
     }
+    // The DB stores avg cost per unit; derive it from the total invested.
+    const avgCostEur = invested / quantity;
     setSaving(true);
     setError(null);
     try {
@@ -97,15 +99,16 @@ export function CryptoHoldingsTable({
   async function saveEdit() {
     if (!editing) return;
     const quantity = Number(editQuantity);
-    const avgCostEur = Number(editAvgCost);
+    const invested = Number(editAvgCost); // total € invested
     if (!Number.isFinite(quantity) || quantity <= 0) {
       setError("Quantity must be a positive number");
       return;
     }
-    if (!Number.isFinite(avgCostEur) || avgCostEur < 0) {
-      setError("Average cost must be 0 or a positive number");
+    if (!Number.isFinite(invested) || invested < 0) {
+      setError("Amount invested must be 0 or a positive number");
       return;
     }
+    const avgCostEur = invested / quantity;
     setSaving(true);
     setError(null);
     try {
@@ -295,7 +298,7 @@ export function CryptoHoldingsTable({
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-white/60">Avg cost (€ per unit)</span>
+            <span className="mb-1 block text-xs font-medium text-white/60">Amount invested (€ total)</span>
             <input
               type="number"
               inputMode="decimal"
@@ -355,14 +358,14 @@ export function CryptoHoldingsTable({
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-white/60">Cost of this purchase (€ per unit)</span>
+            <span className="mb-1 block text-xs font-medium text-white/60">Amount invested (€ total)</span>
             <input
               type="number"
               inputMode="decimal"
               step="any"
               value={addCost}
               onChange={(e) => setAddCost(e.target.value)}
-              placeholder="e.g. 42500"
+              placeholder="e.g. 5000"
               className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30"
             />
           </label>

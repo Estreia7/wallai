@@ -70,15 +70,17 @@ export function CryptoAddHoldingButton() {
   async function save() {
     if (!picked) return;
     const qtyNum = Number(quantity);
-    const costNum = Number(avgCost);
+    const investedNum = Number(avgCost); // total € invested
     if (!Number.isFinite(qtyNum) || qtyNum <= 0) {
       setError("Quantity must be a positive number");
       return;
     }
-    if (!Number.isFinite(costNum) || costNum < 0) {
-      setError("Average cost must be 0 or a positive number");
+    if (!Number.isFinite(investedNum) || investedNum < 0) {
+      setError("Amount invested must be 0 or a positive number");
       return;
     }
+    // Backend stores avg cost per unit; derive it from the total invested.
+    const avgCostEur = investedNum / qtyNum;
     setSaving(true);
     setError(null);
     try {
@@ -88,7 +90,7 @@ export function CryptoAddHoldingButton() {
         body: JSON.stringify({
           coinId: picked.id,
           quantity: qtyNum,
-          avgCostEur: costNum,
+          avgCostEur,
         }),
       });
       if (!res.ok) {
@@ -192,14 +194,14 @@ export function CryptoAddHoldingButton() {
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-white/60">Avg cost (€ per unit)</span>
+              <span className="mb-1 block text-xs font-medium text-white/60">Amount invested (€ total)</span>
               <input
                 type="number"
                 inputMode="decimal"
                 step="any"
                 value={avgCost}
                 onChange={(e) => setAvgCost(e.target.value)}
-                placeholder="e.g. 42500"
+                placeholder="e.g. 5000"
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30"
               />
             </label>
