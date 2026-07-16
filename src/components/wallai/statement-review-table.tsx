@@ -23,6 +23,13 @@ export type ReviewConfirmPayload = {
   detectedAccounts: ReviewDetectedAccount[];
 };
 
+export type ReviewReconciliation = {
+  checked: boolean;
+  reconciles: boolean;
+  computedBalance: number | null;
+  difference: number | null;
+};
+
 type TransactionGroup = {
   monthKey: string;   // YYYY-MM
   label: string;      // e.g. "February 2026"
@@ -61,6 +68,7 @@ export function StatementReviewTable({
   transactions,
   primaryBalance,
   detectedAccounts,
+  reconciliation,
   onConfirm,
   onCancel,
   saving,
@@ -68,6 +76,7 @@ export function StatementReviewTable({
   transactions: ReviewTransaction[];
   primaryBalance: number | null;
   detectedAccounts: ReviewDetectedAccount[];
+  reconciliation?: ReviewReconciliation | null;
   onConfirm: (payload: ReviewConfirmPayload) => void;
   onCancel: () => void;
   saving: boolean;
@@ -148,8 +157,52 @@ export function StatementReviewTable({
 
   const primaryCurrency = rows[0]?.currency ?? detectedAccounts[0]?.currency ?? "EUR";
 
+  const showReconcileWarning =
+    reconciliation?.checked === true && reconciliation.reconciles === false;
+
   return (
     <div className="flex flex-col gap-4">
+      {showReconcileWarning && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+          <div className="flex items-start gap-2">
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m0 3.75h.008M10.363 3.591l-8.106 13.5A1.914 1.914 0 003.89 20h16.22a1.914 1.914 0 001.633-2.909l-8.106-13.5a1.914 1.914 0 00-3.274 0z"
+              />
+            </svg>
+            <div className="min-w-0 text-xs text-amber-100/90">
+              <p className="font-semibold text-amber-200">
+                These transactions don&apos;t add up to the statement&apos;s closing balance
+              </p>
+              <p className="mt-1 text-amber-100/70">
+                The extracted rows sum to{" "}
+                <span className="font-semibold">
+                  {fmt(reconciliation!.computedBalance ?? 0, primaryCurrency)}
+                </span>
+                , but the statement&apos;s closing balance is{" "}
+                <span className="font-semibold">
+                  {fmt(primaryBalance ?? 0, primaryCurrency)}
+                </span>{" "}
+                — off by{" "}
+                <span className="font-semibold">
+                  {fmt(Math.abs(reconciliation!.difference ?? 0), primaryCurrency)}
+                </span>
+                . A row may be missing, duplicated, or have the wrong sign. Please review
+                carefully before importing.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-white/70">
           Found <span className="font-semibold text-white">{rows.length}</span> transactions across{" "}

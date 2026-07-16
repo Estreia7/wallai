@@ -38,7 +38,13 @@ export async function parseStatement(
   }
 
   if (!text.trim()) {
-    return { transactions: [], primaryBalance: null, detectedAccounts: [] };
+    return {
+      transactions: [],
+      openingBalance: null,
+      primaryBalance: null,
+      detectedAccounts: [],
+      reconciliation: { checked: false, reconciles: false, computedBalance: null, difference: null },
+    };
   }
 
   return extractStatementFromText(userId, text);

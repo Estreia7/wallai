@@ -9,12 +9,14 @@ import {
   type ReviewTransaction,
   type ReviewDetectedAccount,
   type ReviewConfirmPayload,
+  type ReviewReconciliation,
 } from "./statement-review-table";
 
 type ParseResult = {
   transactions: ReviewTransaction[];
   primaryBalance: number | null;
   detectedAccounts: ReviewDetectedAccount[];
+  reconciliation: ReviewReconciliation | null;
   fileName: string;
   fileType: string;
   storagePath: string;
@@ -83,6 +85,7 @@ export function StatementUpload({
         transactions: data.transactions ?? [],
         primaryBalance: data.primaryBalance ?? null,
         detectedAccounts: data.detectedAccounts ?? [],
+        reconciliation: data.reconciliation ?? null,
         fileName: data.fileName,
         fileType: data.fileType,
         storagePath: data.storagePath,
@@ -221,6 +224,7 @@ export function StatementUpload({
             transactions={parseResult.transactions}
             primaryBalance={parseResult.primaryBalance}
             detectedAccounts={parseResult.detectedAccounts}
+            reconciliation={parseResult.reconciliation}
             onConfirm={handleConfirm}
             onCancel={() => setParseResult(null)}
             saving={saving}
