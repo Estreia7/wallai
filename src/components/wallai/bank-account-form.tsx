@@ -143,13 +143,13 @@ export function BankAccountForm({
             }}
             className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30"
           >
-            <option value="">— None —</option>
+            <option value="" className="bg-[#0A0E1A] text-white">— None —</option>
             {institutions.map((inst) => (
-              <option key={inst.id} value={inst.id}>
+              <option key={inst.id} value={inst.id} className="bg-[#0A0E1A] text-white">
                 {inst.name}
               </option>
             ))}
-            {onCreateInstitution && <option value="__new__">+ New institution…</option>}
+            {onCreateInstitution && <option value="__new__" className="bg-[#0A0E1A] text-white">+ New institution…</option>}
           </select>
         )}
       </div>
@@ -172,7 +172,7 @@ export function BankAccountForm({
             className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white outline-none focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30"
           >
             {BANK_ACCOUNT_TYPES.map((t) => (
-              <option key={t} value={t}>
+              <option key={t} value={t} className="bg-[#0A0E1A] text-white">
                 {bankAccountTypeLabel(t)}
               </option>
             ))}

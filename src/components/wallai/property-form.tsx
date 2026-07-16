@@ -101,9 +101,9 @@ export function PropertyForm({
             onChange={(e) => setDebtId(e.target.value)}
             className={inputClass}
           >
-            <option value="">None</option>
+            <option value="" className="bg-[#0A0E1A] text-white">None</option>
             {debts.map((d) => (
-              <option key={d.id} value={d.id}>{d.name}</option>
+              <option key={d.id} value={d.id} className="bg-[#0A0E1A] text-white">{d.name}</option>
             ))}
           </select>
         </div>

@@ -175,10 +175,10 @@ export function TransactionList({
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 outline-none focus:border-white/20"
           >
-            <option value="">All categories</option>
-            <option value="__review__">⚠ Needs review (Other / uncategorized)</option>
+            <option value="" className="bg-[#0A0E1A] text-white">All categories</option>
+            <option value="__review__" className="bg-[#0A0E1A] text-white">⚠ Needs review (Other / uncategorized)</option>
             {categories.map((c) => (
-              <option key={c} value={c}>
+              <option key={c} value={c} className="bg-[#0A0E1A] text-white">
                 {c}
               </option>
             ))}
@@ -211,9 +211,9 @@ export function TransactionList({
               disabled={selected.size === 0}
               className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white/80 outline-none focus:border-white/20 disabled:opacity-40"
             >
-              <option value="">Assign category…</option>
+              <option value="" className="bg-[#0A0E1A] text-white">Assign category…</option>
               {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c} className="bg-[#0A0E1A] text-white">{c}</option>
               ))}
             </select>
             <button
@@ -278,9 +278,9 @@ export function TransactionList({
                   onChange={(e) => updateCategory(tx.id, e.target.value)}
                   className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/5 px-2 py-2 text-xs text-white/70 outline-none focus:border-white/20 sm:w-28 sm:flex-none sm:px-1.5 sm:py-1 sm:text-[10px]"
                 >
-                  <option value="">Uncategorized</option>
+                  <option value="" className="bg-[#0A0E1A] text-white">Uncategorized</option>
                   {categories.map((c) => (
-                    <option key={c} value={c}>
+                    <option key={c} value={c} className="bg-[#0A0E1A] text-white">
                       {c}
                     </option>
                   ))}

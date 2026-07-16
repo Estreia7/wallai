@@ -122,7 +122,7 @@ export function DebtForm({
             className={inputClass}
           >
             {DEBT_TYPES.map((t) => (
-              <option key={t} value={t}>{debtTypeLabel(t)}</option>
+              <option key={t} value={t} className="bg-[#0A0E1A] text-white">{debtTypeLabel(t)}</option>
             ))}
           </select>
         </div>
