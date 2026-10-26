@@ -23,12 +23,21 @@ export default function WallAILogin() {
       redirect: false,
     });
 
-    if (result?.ok) {
-      router.push("/dashboard");
-    } else {
-      setError("Invalid email or password");
+    // Auth.js answers a failed credentials sign-in with HTTP 200 and a
+    // redirect URL carrying ?error=..., so `result.ok` is true even when the
+    // password is wrong. Only `result.error` tells us a session was created.
+    if (!result || result.error) {
+      setError(
+        !result || result.error === "CredentialsSignin"
+          ? "Invalid email or password"
+          : "Sign-in failed on the server. Please try again.",
+      );
       setLoading(false);
+      return;
     }
+
+    router.push("/dashboard");
+    router.refresh();
   }
 
   function handleGoogle() {
@@ -79,7 +88,10 @@ export default function WallAILogin() {
             </label>
             <input
               id="email"
-              type="email"
+              type="text"
+              inputMode="email"
+              autoCapitalize="none"
+              spellCheck={false}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none backdrop-blur-sm transition-colors focus:border-emerald-400/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-400/30"

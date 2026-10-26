@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { GradientBg } from "./gradient-bg";
 import { NavMobile } from "./nav-mobile";
@@ -9,21 +9,15 @@ import { NavSidebar } from "./nav-sidebar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
-  const pathname = usePathname();
   const router = useRouter();
 
-  const isLoginPage = pathname === "/";
-
+  // Every route under (app) is private; the public landing lives at "/" and
+  // the sign-in form at "/login", so send signed-out visitors to the form.
   useEffect(() => {
-    if (status === "unauthenticated" && !isLoginPage) {
-      router.replace("/");
+    if (status === "unauthenticated") {
+      router.replace("/login");
     }
-  }, [status, isLoginPage, router]);
-
-  // On login page — render children directly (no nav)
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
+  }, [status, router]);
 
   // Loading state
   if (status === "loading") {
