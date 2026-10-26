@@ -26,9 +26,8 @@ export function CryptoHero({ totals }: { totals: CryptoTotals }) {
   const pnlSign = totals.totalPnlEur >= 0 ? "+" : "";
 
   return (
-    <GlassCard className="relative overflow-hidden">
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/15 to-cyan-500/5 pointer-events-none" />
-      <div className="relative">
+    <GlassCard tone="blue" className="overflow-hidden">
+      <div>
         <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
           Total Crypto Value
         </p>

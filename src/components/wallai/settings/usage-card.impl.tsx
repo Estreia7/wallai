@@ -111,9 +111,8 @@ export function UsageCard() {
     <div className="space-y-4">
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-4">
-        <GlassCard className="relative overflow-hidden">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 pointer-events-none" />
-          <div className="relative">
+        <GlassCard tone="green">
+          <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
               Cost this month
             </p>
@@ -122,9 +121,8 @@ export function UsageCard() {
             </p>
           </div>
         </GlassCard>
-        <GlassCard className="relative overflow-hidden">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 pointer-events-none" />
-          <div className="relative">
+        <GlassCard tone="blue">
+          <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-white/70 sm:text-xs">
               API calls this month
             </p>

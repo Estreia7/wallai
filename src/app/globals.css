@@ -61,6 +61,19 @@ body {
   --dur-exit: 150ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Card world — solid dark surfaces with one tone per card.            */
+  /* Taken from the "course design cards" reference: the card body sits  */
+  /* a step above the page, the footer band a step below it, and a tone  */
+  /* (green / blue / orange / red) carries the card's meaning.            */
+  --surface-card: #232228;
+  --surface-card-footer: #151419;
+  --surface-card-raised: #292929;
+  --surface-card-track: #363636;
+  --tone-green: #01c3a8;
+  --tone-blue: #1890ff;
+  --tone-orange: #ffb741;
+  --tone-red: #a63d2a;
 }
 
 /* §9 Focus & keyboard — never remove focus without a replacement.     */
@@ -90,24 +103,106 @@ body {
     margin-inline: auto;
   }
 
-  /* §7 Card — hairline border + two stacked shadows. Backdrop blur is  */
-  /* left to the component so mobile can stay light (perf).             */
+  /* §7 Card — solid dark surface, hairline border, two stacked shadows.  */
+  /* The card's tone lives in --card-tone: it lights the top edge, washes */
+  /* the top-left corner and colors the progress fill, avatars' add       */
+  /* button and the hover glow. Default tone is the brand accent.         */
   .card {
+    --card-tone: var(--accent);
+    position: relative;
     border-radius: var(--radius-card);
     border: 1px solid rgb(255 255 255 / 0.08);
-    background: rgb(255 255 255 / 0.05);
-    box-shadow: var(--shadow-card);
+    background:
+      radial-gradient(
+        120% 90% at 0% 0%,
+        color-mix(in oklab, var(--card-tone) 14%, transparent),
+        transparent 58%
+      ),
+      var(--surface-card);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--card-tone) 45%, transparent),
+      var(--shadow-card);
+    color: #fff;
+  }
+  .card-tone-green  { --card-tone: var(--tone-green); }
+  .card-tone-blue   { --card-tone: var(--tone-blue); }
+  .card-tone-orange { --card-tone: var(--tone-orange); }
+  .card-tone-red    { --card-tone: var(--tone-red); }
+  .card-tone-none   {
+    --card-tone: var(--accent);
+    background: var(--surface-card);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--shadow-card);
   }
 
-  /* §7 Card hover — lift + deepen shadow together, never scale the card */
+  /* §7 Card hover — lift + deepen shadow together, never scale the card. */
+  /* The glow takes the card's own tone so each card lifts in its color.  */
   .card-hover {
     transition:
       transform var(--dur-hover) var(--ease-out),
-      box-shadow var(--dur-hover) var(--ease-out);
+      box-shadow var(--dur-hover) var(--ease-out),
+      border-color var(--dur-hover) var(--ease-out);
   }
-  .card-hover:hover {
+  .card-hover:hover,
+  .card-hover:focus-within {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lift);
+    border-color: color-mix(in oklab, var(--card-tone) 35%, rgb(255 255 255 / 0.08));
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--card-tone) 80%, transparent),
+      0 2px 6px rgba(2, 8, 20, 0.65),
+      0 20px 44px -14px color-mix(in oklab, var(--card-tone) 45%, transparent);
+  }
+
+  /* Card footer band — one step darker than the body, flush to the edge */
+  .card-footer {
+    background: var(--surface-card-footer);
+    border-top: 1px solid rgb(255 255 255 / 0.06);
+    border-bottom-left-radius: calc(var(--radius-card) - 1px);
+    border-bottom-right-radius: calc(var(--radius-card) - 1px);
+  }
+
+  /* Card progress — the one authored entrance: the fill grows from the  */
+  /* left once, on mount, in the card's tone.                            */
+  .card-progress-track {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--surface-card-track);
+  }
+  .card-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--card-tone);
+    transform-origin: left center;
+    animation: card-progress-fill 600ms var(--ease-out) backwards;
+  }
+  @keyframes card-progress-fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  /* Countdown pill — dark chip in the footer, lights in the tone on hover */
+  .card-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--radius-control);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    background: var(--surface-card-raised);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 8px 12px;
+    transition:
+      background-color var(--dur-hover) var(--ease-out),
+      color var(--dur-hover) var(--ease-out),
+      border-color var(--dur-hover) var(--ease-out);
+  }
+  a.card-countdown:hover,
+  button.card-countdown:hover {
+    background: var(--card-tone);
+    border-color: var(--card-tone);
+    color: var(--surface-card-footer);
   }
 
   /* §2 Type — kicker / section title / lead */

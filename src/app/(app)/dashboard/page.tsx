@@ -133,7 +133,7 @@ export default async function Dashboard() {
           subtext={`${data.stats.cash.accountCount} account${
             data.stats.cash.accountCount === 1 ? "" : "s"
           }`}
-          gradient="from-emerald-500/20 to-emerald-500/5"
+          tone="green"
           configured
           warning={
             data.hasNonPrimaryCurrencyAccount
@@ -153,13 +153,13 @@ export default async function Dashboard() {
                 )
               : null
           }
-          gradient="from-cyan-500/20 to-cyan-500/5"
+          tone="blue"
           configured={data.stats.crypto.configured}
         />
         <StatCard
           label="Property"
           value={formatCurrency(data.stats.propertyEq.value, data.netWorth.currency)}
-          gradient="from-violet-500/20 to-violet-500/5"
+          tone="orange"
           configured={data.stats.propertyEq.configured}
         />
         <StatCard
@@ -172,7 +172,7 @@ export default async function Dashboard() {
                 }`
               : null
           }
-          gradient="from-amber-500/20 to-amber-500/5"
+          tone="red"
           configured={data.stats.debt.configured}
         />
       </div>
