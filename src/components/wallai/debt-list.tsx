@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { GlassCard } from "./glass-card";
+import { CardProgress } from "@/components/ui/course-design-cards";
 import { Modal } from "./modal";
 import { DebtForm, type DebtFormValue } from "./debt-form";
 import { debtTypeLabel, projectPayoff, type DebtType } from "@/lib/wallai/debt-types";
@@ -68,7 +69,7 @@ function DebtCard({
   );
 
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors sm:hover:bg-white/[0.04]">
+    <GlassCard tone="red" hover>
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -93,19 +94,12 @@ function DebtCard({
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-3">
-        <div className="mb-1 flex items-center justify-between text-[10px] text-white/70">
-          <span>Paid {formatCurrency(paid, debt.currency)}</span>
-          <span className="tabular-nums">{progress.toFixed(0)}%</span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-          <div
-            className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+      {/* Progress bar — paid share of the original amount, in the card's tone */}
+      <CardProgress
+        className="mb-3 mt-0"
+        value={progress}
+        label={`Paid ${formatCurrency(paid, debt.currency)}`}
+      />
 
       {/* Projection */}
       <div className="grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-xs">
@@ -159,7 +153,7 @@ function DebtCard({
           Delete
         </button>
       </div>
-    </div>
+    </GlassCard>
   );
 }
 

@@ -21,7 +21,9 @@ reserved for the ONE action or the "you are here" marker on each screen.
 | `accent-2`      | `#22D3EE` (cyan-400)    | Gradient partner (accent→accent-2 marks brand)  |
 | `text`          | `#FFFFFF`           | Primary text on dark                             |
 | `text-muted`    | `white / 70%`       | Secondary text (§2/§8) — never below ~55%        |
-| `surface-card`  | `white / 5%`        | Glass card fill over the base                    |
+| `surface-card`  | `#232228`           | Solid card body (a step above the base)          |
+| `surface-card-footer` | `#151419`     | Card footer band (a step below the body)         |
+| `tone-green/blue/orange/red` | `#01C3A8` `#1890FF` `#FFB741` `#A63D2A` | One tone per card: cash/green, crypto/blue, property/orange, debt/red |
 | `hairline`      | `white / 8–10%`     | Card & divider borders                           |
 
 Rules:
@@ -122,14 +124,23 @@ Rules:
   not as one rigid block.
 - Everything respects `prefers-reduced-motion: reduce`.
 
-## 7. Cards — the premium recipe
+## 7. Cards — the course-card recipe
 
-1. Generous padding (16–24px content pages; up to 40px feature panels).
-2. Title first: display face, 600–700 weight; body subordinated at ~55–70%
-   opacity.
-3. Two stacked shadows (see §5) + hairline border.
-4. `rounded-xl`, images flush under `overflow-hidden`.
-5. Hover: lift + shadow deepen + image scale — 200ms ease-out.
+Every card in the app is built from `@/components/ui/course-design-cards`
+(`GlassCard` is a thin wrapper over its `CardSurface`). The look: a solid
+dark body, one tone per card, a darker footer band, and a lift-and-glow hover.
+
+1. Solid `surface-card` body, hairline border, two stacked shadows (§5).
+2. **One tone per card** (`tone="green|blue|orange|red"`, default = brand
+   accent). The tone lights the card's top edge, washes its top-left corner,
+   fills its progress bar and colours its hover glow. Never more than one.
+3. Anatomy, top to bottom, each part optional: `CardHeader` (date + overflow
+   menu) → `CardBody` (small uppercase title, bold description) →
+   `CardProgress` (label, tone fill, value; fills once on mount) →
+   `CardFooter` on the darker band holding `AvatarStack` and `CountdownPill`.
+4. Generous padding (16–20px), `rounded-xl`, footer flush to the edge.
+5. Hover (`hover` prop): lift 4px + tone glow, 200ms ease-out, never scale.
+   Read-only panels stay still; `tone="none"` drops the colour entirely.
 
 ## 8. Color accessibility
 
