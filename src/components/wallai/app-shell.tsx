@@ -8,16 +8,21 @@ import { NavMobile } from "./nav-mobile";
 import { NavSidebar } from "./nav-sidebar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const router = useRouter();
+  const mustChangePassword = session?.user?.mustChangePassword === true;
 
   // Every route under (app) is private; the public landing lives at "/" and
   // the sign-in form at "/login", so send signed-out visitors to the form.
+  // Accounts still on the temporary seed password go to /change-password
+  // before they can use the app.
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/login");
+    } else if (status === "authenticated" && mustChangePassword) {
+      router.replace("/change-password");
     }
-  }, [status, router]);
+  }, [status, mustChangePassword, router]);
 
   // Loading state
   if (status === "loading") {

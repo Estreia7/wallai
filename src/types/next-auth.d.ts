@@ -6,6 +6,8 @@ declare module "next-auth" {
       id: string;
       role: string;
       plan: string;
+      /** True while the account still uses the temporary seed password. */
+      mustChangePassword: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -15,5 +17,6 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: string;
     plan?: string;
+    mustChangePassword?: boolean;
   }
 }

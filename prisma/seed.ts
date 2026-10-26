@@ -345,24 +345,33 @@ for (const b of CURATED_BOOKS) {
 }
 
 async function main() {
-  // The admin account. Login: type "admin" (mapped to this email) / password below.
-  const adminPasswordHash = await bcrypt.hash("adminwallai", 12);
+  // The admin account. Login: type "admin" (mapped to this email) with the
+  // temporary password below; the app forces a password change on first login.
+  // Re-running the seed never touches an existing admin's password unless
+  // RESET_ADMIN_PASSWORD=true is set (useful when the password was lost).
+  const adminPasswordHash = await bcrypt.hash("123456", 12);
+  const resetAdminPassword = process.env.RESET_ADMIN_PASSWORD === "true";
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@wallai.app" },
     update: {
-      // Keep the admin promoted and its password in sync with the seed.
       role: "admin",
-      passwordHash: adminPasswordHash,
+      ...(resetAdminPassword
+        ? { passwordHash: adminPasswordHash, mustChangePassword: true }
+        : {}),
     },
     create: {
       name: "Admin",
       email: "admin@wallai.app",
       passwordHash: adminPasswordHash,
+      mustChangePassword: true,
       primaryCurrency: "EUR",
       role: "admin",
     },
   });
+  if (resetAdminPassword) {
+    console.log("Admin password reset to the temporary seed password (change required on login).");
+  }
 
   console.log("Seeded admin user:", admin.email, `(role=${admin.role})`);
 

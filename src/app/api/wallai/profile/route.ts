@@ -12,7 +12,7 @@ export async function PUT(request: Request) {
   const body = await request.json();
   const { name, currency, currentPassword, newPassword } = body;
 
-  const data: Record<string, string> = {};
+  const data: Record<string, string | boolean> = {};
 
   if (typeof name === "string" && name.trim().length > 0) {
     data.name = name.trim();
@@ -41,7 +41,13 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
     }
 
+    if (newPassword === currentPassword) {
+      return NextResponse.json({ error: "New password must be different from the current one" }, { status: 400 });
+    }
+
     data.passwordHash = await bcrypt.hash(newPassword, 12);
+    // A chosen password clears the forced-change flag set by the seed.
+    data.mustChangePassword = false;
   }
 
   if (Object.keys(data).length === 0) {
