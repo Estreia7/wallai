@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useState, useCallback } from "react";
 import { GlassCard } from "./glass-card";
 import { ALL_CATEGORIES } from "@/lib/wallai/categories";
@@ -216,13 +217,12 @@ export function TransactionList({
                 <option key={c} value={c} className="bg-[#0A0E1A] text-white">{c}</option>
               ))}
             </select>
-            <button
+            <InteractiveHoverButton
+              size="sm"
               onClick={bulkAssign}
               disabled={selected.size === 0 || !bulkCategory || bulkBusy}
-              className="rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
-            >
-              {bulkBusy ? "Applying…" : "Apply"}
-            </button>
+              text={bulkBusy ? "Applying…" : "Apply"}
+            />
           </div>
         </div>
       )}

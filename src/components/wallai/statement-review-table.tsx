@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useMemo, useState } from "react";
 import { bankAccountTypeLabel } from "@/lib/wallai/bank-account-types";
 
@@ -404,13 +405,12 @@ export function StatementReviewTable({
         className="sticky bottom-0 -mx-4 -mb-4 flex gap-2 border-t border-white/10 bg-[#0A0E1A]/95 px-4 py-3 backdrop-blur-lg sm:-mx-6 sm:-mb-6 sm:px-6 sm:py-4"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
-        <button
+        <InteractiveHoverButton
           onClick={submit}
           disabled={saving}
-          className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110 disabled:opacity-40"
-        >
-          {saving ? "Importing..." : `Import ${rows.length} transactions`}
-        </button>
+          className="flex-1"
+          text={saving ? "Importing..." : `Import ${rows.length} transactions`}
+        />
         <button
           onClick={onCancel}
           disabled={saving}

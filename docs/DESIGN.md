@@ -142,6 +142,17 @@ dark body, one tone per card, a darker footer band, and a lift-and-glow hover.
 5. Hover (`hover` prop): lift 4px + tone glow, 200ms ease-out, never scale.
    Read-only panels stay still; `tone="none"` drops the colour entirely.
 
+### Buttons — the interactive hover button
+
+Every primary action is `InteractiveHoverButton` (or `InteractiveHoverLink`
+for navigation) from `@/components/ui/interactive-hover-button`: a dark
+pill with a small accent dot before the label. On hover the dot grows into
+an accent fill while the label slides out and returns with an arrow.
+Sizes `sm` (table headers, inline rows), `md` (forms, section actions) and
+`lg` (landing CTAs); `className` carries `w-full` / `flex-1`. Secondary
+actions (Cancel, Edit, Delete) stay as quiet text or hairline buttons so the
+one accent per screen rule (§1) still holds.
+
 ## 8. Color accessibility
 
 - Body text ≥ **4.5:1** contrast; large text ≥ **3:1**. The background

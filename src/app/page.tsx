@@ -1,3 +1,4 @@
+import { InteractiveHoverLink } from "@/components/ui/interactive-hover-button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GradientBg } from "@/components/wallai/gradient-bg";
@@ -124,12 +125,7 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-3 text-sm font-semibold text-[#04140f] shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110"
-            >
-              Get started
-            </Link>
+            <InteractiveHoverLink href="/login" size="lg" text="Get started" />
             <Link
               href="#how"
               className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur transition-colors hover:bg-white/10"
@@ -218,12 +214,12 @@ export default function LandingPage() {
             <p className="lead relative mx-auto mt-4 max-w-md">
               It takes one statement to start. Wallai does the rest.
             </p>
-            <Link
+            <InteractiveHoverLink
               href="/login"
-              className="relative mt-8 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-3.5 text-sm font-semibold text-[#04140f] shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110"
-            >
-              Get started
-            </Link>
+              size="lg"
+              className="relative mt-8"
+              text="Get started"
+            />
           </div>
         </Reveal>
       </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useState } from "react";
 import { GlassCard } from "./glass-card";
 import { CardProgress } from "@/components/ui/course-design-cards";
@@ -207,15 +208,13 @@ export function DebtList() {
     <>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="section-title">Debts &amp; Loans</h2>
-        <button
+        <InteractiveHoverButton
+          text="Add debt"
           onClick={() => {
             setEditing(null);
             setModalOpen(true);
           }}
-          className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110"
-        >
-          + Add debt
-        </button>
+        />
       </div>
 
       {loading ? (

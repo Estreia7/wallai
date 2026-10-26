@@ -8,6 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Primary action fill + the text that sits on it (interactive hover button) */
+  --color-primary: var(--accent);
+  --color-primary-foreground: #04140f;
   --font-sans: var(--font-geist-sans);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }

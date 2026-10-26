@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useState } from "react";
 import { GlassCard } from "@/components/wallai/glass-card";
 
@@ -75,9 +76,6 @@ export function ProfileCard({ initialName, email }: ProfileCardProps) {
 
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-emerald-400/50 focus:bg-white/10 focus:ring-1 focus:ring-emerald-400/30";
-  const btnClass =
-    "rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-colors hover:brightness-110 disabled:opacity-40";
-
   return (
     <GlassCard>
       <h3 className="mb-4 text-sm font-semibold text-white">Profile</h3>
@@ -98,13 +96,11 @@ export function ProfileCard({ initialName, email }: ProfileCardProps) {
             onChange={(e) => setName(e.target.value)}
             className={inputClass}
           />
-          <button
+          <InteractiveHoverButton
             type="submit"
             disabled={saving || !name.trim() || name === initialName}
-            className={btnClass}
-          >
-            {saving ? "..." : "Save"}
-          </button>
+            text={saving ? "Saving..." : "Save"}
+          />
         </div>
         {message && (
           <p className={`mt-2 text-xs ${message.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
@@ -138,13 +134,11 @@ export function ProfileCard({ initialName, email }: ProfileCardProps) {
             placeholder="Confirm new password"
             className={inputClass}
           />
-          <button
+          <InteractiveHoverButton
             type="submit"
             disabled={pwSaving || !currentPassword || !newPassword || !confirmPassword}
-            className={btnClass}
-          >
-            {pwSaving ? "Changing..." : "Change Password"}
-          </button>
+            text={pwSaving ? "Changing..." : "Change password"}
+          />
         </form>
         {pwMessage && (
           <p className={`mt-2 text-xs ${pwMessage.type === "success" ? "text-emerald-400" : "text-red-400"}`}>
