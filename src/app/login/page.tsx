@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { GradientBg } from "@/components/wallai/gradient-bg";
 
 export default function WallAILogin() {
@@ -36,7 +36,9 @@ export default function WallAILogin() {
       return;
     }
 
-    router.push("/dashboard");
+    // Accounts still on the temporary seed password must pick a new one first.
+    const session = await getSession();
+    router.push(session?.user?.mustChangePassword ? "/change-password" : "/dashboard");
     router.refresh();
   }
 

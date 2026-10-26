@@ -77,11 +77,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { role: true, plan: true },
+          select: { role: true, plan: true, mustChangePassword: true },
         });
         if (dbUser) {
           token.role = dbUser.role;
           token.plan = dbUser.plan;
+          token.mustChangePassword = dbUser.mustChangePassword;
         }
       }
       return token;
@@ -91,6 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = (token.role as string) ?? "user";
         session.user.plan = (token.plan as string) ?? "free";
+        session.user.mustChangePassword = token.mustChangePassword === true;
       }
       return session;
     },
