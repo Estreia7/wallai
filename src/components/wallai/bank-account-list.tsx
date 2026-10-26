@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GlassCard } from "./glass-card";
 import { Modal } from "./modal";
@@ -174,15 +175,14 @@ export function BankAccountList({
       <GlassCard>
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white">Bank Accounts</h3>
-          <button
+          <InteractiveHoverButton
+            size="sm"
+            text="Add"
             onClick={() => {
               setEditing(null);
               setModalOpen(true);
             }}
-            className="rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110"
-          >
-            + Add
-          </button>
+          />
         </div>
 
         {loading ? (
@@ -511,13 +511,11 @@ function ManageInstitutions({
           disabled={busy}
           className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30"
         />
-        <button
+        <InteractiveHoverButton
           type="submit"
           disabled={busy || !newName.trim()}
-          className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110 disabled:opacity-40"
-        >
-          + New
-        </button>
+          text="New"
+        />
       </form>
 
       {error && <p className="text-xs text-red-400">{error}</p>}

@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useState } from "react";
 import { GlassCard } from "./glass-card";
 
@@ -83,13 +84,12 @@ export function ApiKeyCard() {
           autoComplete="off"
         />
         <div className="flex gap-2">
-          <button
+          <InteractiveHoverButton
             type="submit"
             disabled={saving || apiKey.length < 20}
-            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-colors hover:brightness-110 disabled:opacity-40"
-          >
-            {saving ? "Saving..." : configured ? "Replace key" : "Save key"}
-          </button>
+            className="flex-1"
+            text={saving ? "Saving..." : configured ? "Replace key" : "Save key"}
+          />
           {configured && (
             <button
               type="button"

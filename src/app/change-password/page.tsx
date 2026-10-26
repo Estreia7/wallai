@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -135,13 +136,12 @@ export default function ChangePasswordPage() {
 
             {error && <p className="text-sm text-red-400">{error}</p>}
 
-            <button
+            <InteractiveHoverButton
               type="submit"
               disabled={saving}
-              className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-colors hover:shadow-emerald-500/40 hover:brightness-110 disabled:opacity-60"
-            >
-              {saving ? "Saving..." : "Save new password"}
-            </button>
+              className="w-full"
+              text={saving ? "Saving..." : "Save new password"}
+            />
           </form>
         </div>
 

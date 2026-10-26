@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useMemo, useState } from "react";
 import { GlassCard } from "@/components/wallai/glass-card";
 
@@ -153,13 +154,12 @@ export function CategoriesCard() {
           <option value="income" className="bg-[#0A0E1A]">Income</option>
           <option value="transfer" className="bg-[#0A0E1A]">Transfer</option>
         </select>
-        <button
+        <InteractiveHoverButton
+          size="sm"
           onClick={addCategory}
           disabled={!newName.trim()}
-          className="rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
-        >
-          Add
-        </button>
+          text="Add"
+        />
       </div>
 
       {error && <p className="mb-3 text-xs text-red-400">⚠ {error}</p>}

@@ -1,5 +1,6 @@
 "use client";
 
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { useEffect, useState } from "react";
 
 export type PropertyFormValue = {
@@ -129,13 +130,12 @@ export function PropertyForm({
       {error && <p className="text-xs text-red-400">{error}</p>}
 
       <div className="flex gap-2 pt-1">
-        <button
+        <InteractiveHoverButton
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110 disabled:opacity-40"
-        >
-          {saving ? "Saving..." : "Save"}
-        </button>
+          className="flex-1"
+          text={saving ? "Saving..." : "Save"}
+        />
         <button
           type="button"
           onClick={onCancel}
